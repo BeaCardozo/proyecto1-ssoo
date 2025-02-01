@@ -1,6 +1,7 @@
 package igu;
 
-import javax.swing.JFrame;
+import java.awt.Component;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -14,9 +15,28 @@ public class MainView extends javax.swing.JFrame {
     public MainView() {
         // Inicializa la configuración de la ventana
         initComponents();
-        IOBoundPanel.setVisible(false);
         setTitle("Process Simulator");
+        disableJPanel(IOBoundOption.isSelected());
     }
+    
+    public void disableJPanel (boolean value) {
+        for(Component a: IOBoundPanel.getComponents()) {
+            a.setEnabled(value);
+        }
+    }
+    
+    private void resetSpinners() {
+        CyclesGenerateExcepSpinner.setValue(1);
+        CyclesSatisfyExcepSpinner.setValue(1);
+    }
+    
+    private void resetFields() {
+        ProcessNameTextField.setText("");
+        IOBoundOption.setSelected(true);
+        CPUBoundOption.setSelected(false);
+        resetSpinners();
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -41,19 +61,19 @@ public class MainView extends javax.swing.JFrame {
         ProcessNameLabel = new javax.swing.JLabel();
         ProcessNameTextField = new javax.swing.JTextField();
         IOBoundPanel = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jSpinner1 = new javax.swing.JSpinner();
-        jSpinner2 = new javax.swing.JSpinner();
+        CyclesSatisfyExcepLabel = new javax.swing.JLabel();
+        CyclesGenerateExcepLabel = new javax.swing.JLabel();
+        CyclesSatisfyExcepSpinner = new javax.swing.JSpinner();
+        CyclesGenerateExcepSpinner = new javax.swing.JSpinner();
         SystemSpecificationsPanel = new javax.swing.JPanel();
         PlanningPolicyLabel = new javax.swing.JLabel();
-        msLabel = new javax.swing.JLabel();
         CicleDurationLabel = new javax.swing.JLabel();
         ActiveProcessorsTextField = new javax.swing.JLabel();
         CicleDurationTextField1 = new javax.swing.JTextField();
         PlanninPolicyComboBox = new javax.swing.JComboBox<>();
         TwoProcessorsOption = new javax.swing.JRadioButton();
         ThreeProcessorsOption = new javax.swing.JRadioButton();
+        TimeUnitComboBox = new javax.swing.JComboBox<>();
         StartSimulationButton = new javax.swing.JButton();
         SimulationPanel = new javax.swing.JPanel();
         SystemPerfomanceMetricsPanel = new javax.swing.JPanel();
@@ -78,6 +98,7 @@ public class MainView extends javax.swing.JFrame {
 
         ProcessTypeGroup.add(IOBoundOption);
         IOBoundOption.setFont(new java.awt.Font("Geneva", 1, 13)); // NOI18N
+        IOBoundOption.setSelected(true);
         IOBoundOption.setText("I/O Bound");
         IOBoundOption.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -160,20 +181,31 @@ public class MainView extends javax.swing.JFrame {
                 ProcessNameTextFieldActionPerformed(evt);
             }
         });
+        ProcessNameTextField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                ProcessNameTextFieldKeyTyped(evt);
+            }
+        });
         ProcessDetailsPanel.add(ProcessNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 250, -1));
 
         IOBoundPanel.setBackground(new java.awt.Color(255, 255, 255));
         IOBoundPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel1.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
-        jLabel1.setText("Cycles to satisfy an exception:");
-        IOBoundPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
+        CyclesSatisfyExcepLabel.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        CyclesSatisfyExcepLabel.setText("Cycles to satisfy an exception:");
+        IOBoundPanel.add(CyclesSatisfyExcepLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
 
-        jLabel2.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
-        jLabel2.setText("Cycles to generate an exception:");
-        IOBoundPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
-        IOBoundPanel.add(jSpinner1, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 90, -1, -1));
-        IOBoundPanel.add(jSpinner2, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 30, -1, -1));
+        CyclesGenerateExcepLabel.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        CyclesGenerateExcepLabel.setText("Cycles to generate an exception:");
+        IOBoundPanel.add(CyclesGenerateExcepLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, -1, -1));
+
+        CyclesSatisfyExcepSpinner.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        CyclesSatisfyExcepSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 50, 1));
+        IOBoundPanel.add(CyclesSatisfyExcepSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 90, -1, -1));
+
+        CyclesGenerateExcepSpinner.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        CyclesGenerateExcepSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 50, 1));
+        IOBoundPanel.add(CyclesGenerateExcepSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 30, -1, -1));
 
         ProcessDetailsPanel.add(IOBoundPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 260, 120));
 
@@ -185,11 +217,7 @@ public class MainView extends javax.swing.JFrame {
 
         PlanningPolicyLabel.setFont(new java.awt.Font("Geneva", 1, 13)); // NOI18N
         PlanningPolicyLabel.setText("Planning Policy:");
-        SystemSpecificationsPanel.add(PlanningPolicyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 210, -1));
-
-        msLabel.setFont(new java.awt.Font("Geneva", 1, 13)); // NOI18N
-        msLabel.setText("ms.");
-        SystemSpecificationsPanel.add(msLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 50, -1, -1));
+        SystemSpecificationsPanel.add(PlanningPolicyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 170, 210, -1));
 
         CicleDurationLabel.setFont(new java.awt.Font("Geneva", 1, 13)); // NOI18N
         CicleDurationLabel.setText("Cycle Duration:");
@@ -206,11 +234,17 @@ public class MainView extends javax.swing.JFrame {
                 CicleDurationTextField1ActionPerformed(evt);
             }
         });
-        SystemSpecificationsPanel.add(CicleDurationTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 220, -1));
+        CicleDurationTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                CicleDurationTextField1KeyTyped(evt);
+            }
+        });
+        SystemSpecificationsPanel.add(CicleDurationTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 160, -1));
 
-        PlanninPolicyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        PlanninPolicyComboBox.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        SystemSpecificationsPanel.add(PlanninPolicyComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 250, -1));
+        PlanninPolicyComboBox.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        PlanninPolicyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Round Robin", "FCFS - First-Come, First-Served", "SJF - Shortest Job First", " " }));
+        PlanninPolicyComboBox.setBorder(null);
+        SystemSpecificationsPanel.add(PlanninPolicyComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 260, -1));
 
         ActiveProcessorsGroup.add(TwoProcessorsOption);
         TwoProcessorsOption.setText("2");
@@ -219,6 +253,10 @@ public class MainView extends javax.swing.JFrame {
         ActiveProcessorsGroup.add(ThreeProcessorsOption);
         ThreeProcessorsOption.setText("3");
         SystemSpecificationsPanel.add(ThreeProcessorsOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 120, -1, -1));
+
+        TimeUnitComboBox.setFont(new java.awt.Font("Geneva", 1, 13)); // NOI18N
+        TimeUnitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "s", "ms" }));
+        SystemSpecificationsPanel.add(TimeUnitComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 50, -1, -1));
 
         ConfigPanel.add(SystemSpecificationsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 570, 280, 240));
 
@@ -267,13 +305,24 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_StartSimulationButtonActionPerformed
 
     private void IOBoundOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IOBoundOptionActionPerformed
-        if (IOBoundOption.isSelected()) {
-        IOBoundPanel.setVisible(true);  // Muestra el panel
-        }
+        disableJPanel(true);
     }//GEN-LAST:event_IOBoundOptionActionPerformed
 
     private void AddProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddProcessButtonActionPerformed
-        // TODO add your handling code here:
+       //Validate fields
+       String message = "Attention: Please fill in all required fields.";
+        if (ProcessNameTextField.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (IOBoundOption.isSelected()) {
+            if ((int) CyclesGenerateExcepSpinner.getValue() < 1 || (int) CyclesSatisfyExcepSpinner.getValue() < 1) {
+                JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.WARNING_MESSAGE);
+                return; 
+            }
+        }
+        JOptionPane.showMessageDialog(null, "Process Created!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        resetFields();
     }//GEN-LAST:event_AddProcessButtonActionPerformed
 
     private void DeleteProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteProcessButtonActionPerformed
@@ -281,7 +330,8 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_DeleteProcessButtonActionPerformed
 
     private void ProcessNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProcessNameTextFieldActionPerformed
-        // TODO add your handling code here:
+        // Obtiene el texto del campo
+        
     }//GEN-LAST:event_ProcessNameTextFieldActionPerformed
 
     private void CicleDurationTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CicleDurationTextField1ActionPerformed
@@ -289,10 +339,22 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_CicleDurationTextField1ActionPerformed
 
     private void CPUBoundOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CPUBoundOptionActionPerformed
-        if (CPUBoundOption.isSelected()) {
-        IOBoundPanel.setVisible(false);  // Muestra el panel
-        }      
+        disableJPanel(false);
+        resetSpinners();
     }//GEN-LAST:event_CPUBoundOptionActionPerformed
+
+    private void ProcessNameTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_ProcessNameTextFieldKeyTyped
+        char c = evt.getKeyChar();
+        if (!Character.isLetterOrDigit(c) && c != ' ') {
+            evt.consume(); 
+        }
+    }//GEN-LAST:event_ProcessNameTextFieldKeyTyped
+
+    private void CicleDurationTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CicleDurationTextField1KeyTyped
+        char c = evt.getKeyChar();
+        if(c < '0' || c > '9') evt.consume();
+    }//GEN-LAST:event_CicleDurationTextField1KeyTyped
+    
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -304,6 +366,10 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JTextField CicleDurationTextField1;
     private javax.swing.JButton ClearProcessTableButton;
     private javax.swing.JPanel ConfigPanel;
+    private javax.swing.JLabel CyclesGenerateExcepLabel;
+    private javax.swing.JSpinner CyclesGenerateExcepSpinner;
+    private javax.swing.JLabel CyclesSatisfyExcepLabel;
+    private javax.swing.JSpinner CyclesSatisfyExcepSpinner;
     private javax.swing.JButton DeleteProcessButton;
     private javax.swing.JPanel GraphicsPanel;
     private javax.swing.JRadioButton IOBoundOption;
@@ -322,12 +388,8 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JPanel SystemPerfomanceMetricsPanel;
     private javax.swing.JPanel SystemSpecificationsPanel;
     private javax.swing.JRadioButton ThreeProcessorsOption;
+    private javax.swing.JComboBox<String> TimeUnitComboBox;
     private javax.swing.JRadioButton TwoProcessorsOption;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JSpinner jSpinner1;
-    private javax.swing.JSpinner jSpinner2;
-    private javax.swing.JLabel msLabel;
     // End of variables declaration//GEN-END:variables
 }
