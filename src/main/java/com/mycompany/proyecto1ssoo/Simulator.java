@@ -12,14 +12,14 @@ public class Simulator {
     private String schedulingPolicy;
 
     public Simulator(int numProcessors) {
-        this.readyQueue = new ProcessQueue(100); // Maximum capacity of 100 processes
-        this.blockedQueue = new ProcessQueue(100); // Maximum capacity of 100 processes
+        this.readyQueue = new ProcessQueue(100); 
+        this.blockedQueue = new ProcessQueue(100); 
         this.processors = new Processor[numProcessors];
         for (int i = 0; i < numProcessors; i++) {
             processors[i] = new Processor(i);
         }
         this.globalCycle = 0;
-        this.schedulingPolicy = "FCFS"; // Default is FCFS (First-Come, First-Served)
+        this.schedulingPolicy = "FCFS"; // Default is FCFS (First-Come, First-Served) 
     }
 
     public void addProcess(Process process) {
@@ -47,7 +47,6 @@ public class Simulator {
 
     public void changeSchedulingPolicy(String newPolicy) {
         this.schedulingPolicy = newPolicy;
-        // Here, you could implement logic to reorder the ready queue
     }
 
     public int getGlobalCycle() { return globalCycle; }

@@ -37,6 +37,36 @@ public class ProcessQueue {
             return process;
         }
     }
+    
+    
+    public boolean remove(Process processToRemove) {
+        if (front > end) {
+            System.out.println("Queue empty, no processes to remove.");
+            return false; 
+        }
+        for (int i = front; i <= end; i++) {
+            if (processes[i].equals(processToRemove)) { 
+                for (int j = i; j < end; j++) {
+                    processes[j] = processes[j + 1];
+                }
+                processes[end] = null;
+                end--; 
+                System.out.println("Process removed successfully.");
+                return true; 
+            }
+        }
+        System.out.println("Process not found in the queue.");
+        return false; 
+    }
+    
+    public boolean containsName(String name) {
+        for (int i = front; i <= end; i++) {
+            if (processes[i].getName().equals(name)) { 
+                return true; 
+            }
+        }
+        return false; 
+    }
 
     public boolean isEmpty() {
         return front > end;
@@ -44,6 +74,12 @@ public class ProcessQueue {
 
     public int size() {
         return end - front + 1;
+    }
+    
+    public void clear() {
+        front = 0;
+        end = -1;  
+        System.out.println("Queue cleared.");
     }
 
     public Process get(int index) {

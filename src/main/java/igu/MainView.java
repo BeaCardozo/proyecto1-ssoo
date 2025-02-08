@@ -21,11 +21,12 @@ public class MainView extends javax.swing.JFrame {
      */
     public MainView() {
         initComponents();
+        simulator = new Simulator(2); // Esto es correcto
+        updateButtonStates(); // Este método debe ser llamado después de inicializar el simulador
         setTitle("Process Simulator");
         disableJPanel(IOBoundOption.isSelected());
-        simulator = new Simulator(2);
     }
-    
+     
     public void disableJPanel (boolean value) {
         for(Component a: IOBoundPanel.getComponents()) {
             a.setEnabled(value);
@@ -42,6 +43,22 @@ public class MainView extends javax.swing.JFrame {
         IOBoundOption.setSelected(true);
         CPUBoundOption.setSelected(false);
         resetSpinners();
+    }
+    
+    private void updateButtonStates() {
+        boolean isQueueEmpty = simulator.getReadyQueue().isEmpty();
+        System.out.println("Is queue empty: " + isQueueEmpty); // Para depurar
+        ClearProcessTableButton.setEnabled(!isQueueEmpty);
+        DeleteProcessButton.setEnabled(!isQueueEmpty);
+        StartSimulationButton.setEnabled(!isQueueEmpty);
+    }
+    
+    private Process getSelectedProcess() {
+        int selectedRow = ProcessTable.getSelectedRow(); 
+        if (selectedRow >= 0) {
+        return simulator.getReadyQueue().get(selectedRow);
+        }
+        return null; 
     }
 
     /**
@@ -124,19 +141,27 @@ public class MainView extends javax.swing.JFrame {
         });
         ProcessDetailsPanel.add(CPUBoundOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 110, -1, -1));
 
+        ProcessTable.setAutoCreateRowSorter(true);
         ProcessTable.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         ProcessTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
-                {null, null},
-                {null, null},
-                {null, null}
+
             },
             new String [] {
-                "Name", "Type"
+                "Process Name", "Process Type"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         ProcessTable.setSelectionBackground(new java.awt.Color(169, 217, 241));
+        ProcessTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        ProcessTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(ProcessTable);
 
         ProcessDetailsPanel.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 260, 150));
@@ -183,11 +208,6 @@ public class MainView extends javax.swing.JFrame {
 
         ProcessNameTextField.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         ProcessNameTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        ProcessNameTextField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ProcessNameTextFieldActionPerformed(evt);
-            }
-        });
         ProcessNameTextField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 ProcessNameTextFieldKeyTyped(evt);
@@ -236,11 +256,6 @@ public class MainView extends javax.swing.JFrame {
 
         CicleDurationTextField1.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         CicleDurationTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        CicleDurationTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CicleDurationTextField1ActionPerformed(evt);
-            }
-        });
         CicleDurationTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 CicleDurationTextField1KeyTyped(evt);
@@ -249,18 +264,13 @@ public class MainView extends javax.swing.JFrame {
         SystemSpecificationsPanel.add(CicleDurationTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 160, -1));
 
         PlanninPolicyComboBox.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
-        PlanninPolicyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Round Robin", "FCFS - First-Come, First-Served", "SJF - Shortest Job First", " " }));
+        PlanninPolicyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "FCFS - First-Come, First-Served", "Round Robin", "SJF - Shortest Job First", " " }));
         PlanninPolicyComboBox.setBorder(null);
         SystemSpecificationsPanel.add(PlanninPolicyComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 260, -1));
 
         ActiveProcessorsGroup.add(TwoProcessorsOption);
         TwoProcessorsOption.setSelected(true);
         TwoProcessorsOption.setText("2");
-        TwoProcessorsOption.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                TwoProcessorsOptionActionPerformed(evt);
-            }
-        });
         SystemSpecificationsPanel.add(TwoProcessorsOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 120, -1, -1));
 
         ActiveProcessorsGroup.add(ThreeProcessorsOption);
@@ -310,16 +320,28 @@ public class MainView extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ClearProcessTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ClearProcessTableButtonActionPerformed
-        // TODO add your handling code here:
+        int response = JOptionPane.showConfirmDialog(
+            null,
+            "Are you sure you want to clear the processes?",
+            "Yes",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        if (response == JOptionPane.YES_OPTION) {
+            simulator.getReadyQueue().clear(); 
+            updateInterface(); 
+            updateButtonStates();
+            JOptionPane.showMessageDialog(null, "Process queue cleared successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            System.out.println("Process clearing canceled."); 
+        }
     }//GEN-LAST:event_ClearProcessTableButtonActionPerformed
 
     private void StartSimulationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartSimulationButtonActionPerformed
-
         int cycleDuration = Integer.parseInt(CicleDurationTextField1.getText());
         int numProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
-
         simulator = new Simulator(numProcessors);
-
         Timer timer = new Timer(cycleDuration * 1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -328,8 +350,6 @@ public class MainView extends javax.swing.JFrame {
             }
         });
         timer.start();
-
-        
         StartSimulationButton.setEnabled(false);
     }//GEN-LAST:event_StartSimulationButtonActionPerformed
 
@@ -339,75 +359,70 @@ public class MainView extends javax.swing.JFrame {
 
     private void AddProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddProcessButtonActionPerformed
        // Validar campos
-        String message = "Attention: Please fill in all required fields.";
+        String message = "Attention: Please fill in all required fields."; 
         if (ProcessNameTextField.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.WARNING_MESSAGE);
-            return;
+            return; 
         }
 
-        // Obtener los valores de los campos
-        String nombre = ProcessNameTextField.getText();
+        String name = ProcessNameTextField.getText();
+        // Validar que no exista el nombre del proceso en la cola
+        if (simulator.getReadyQueue().containsName(name)) { 
+            JOptionPane.showMessageDialog(null, "A process with that name already exists.", "Error", JOptionPane.WARNING_MESSAGE);
+            return; 
+        }
+
         boolean isCpuBound = CPUBoundOption.isSelected();
-        int ciclosExcepcion = (int) CyclesGenerateExcepSpinner.getValue();
-        int ciclosSatisfaccion = (int) CyclesSatisfyExcepSpinner.getValue();
+        int exceptionCycle = (int) CyclesGenerateExcepSpinner.getValue();
+        int satisfactionCycle = (int) CyclesSatisfyExcepSpinner.getValue();
 
-        // Imprimir detalles del process en la consola
-        System.out.println("Creando proceso:");
-        System.out.println("Nombre: " + nombre);
-        System.out.println("Tipo: " + (isCpuBound ? "CPU Bound" : "I/O Bound"));
-        System.out.println("Ciclos para excepción: " + ciclosExcepcion);
-        System.out.println("Ciclos para satisfacer excepción: " + ciclosSatisfaccion);
+        System.out.println("Creating process:");
+        System.out.println("Name: " + name);
+        System.out.println("Type: " + (isCpuBound ? "CPU Bound" : "I/O Bound"));
+        System.out.println("Cycles to generate an exception: " + exceptionCycle);
+        System.out.println("Cycles to satisfy an exception: " + satisfactionCycle);
 
-        // Crear el process
-        Process process = new Process(simulator.getGlobalCycle(), nombre, 10, isCpuBound, ciclosExcepcion, ciclosSatisfaccion);
-
-        // Agregar el process al simulator
+        // Crear el proceso
+        Process process = new Process(simulator.getGlobalCycle(), name, 10, isCpuBound, exceptionCycle, satisfactionCycle);
+    
+        // Agregar el proceso al simulador
         simulator.addProcess(process);
 
-        // Actualizar la tabla de procesos
         DefaultTableModel modelo = (DefaultTableModel) ProcessTable.getModel();
         modelo.addRow(new Object[]{process.getName(), isCpuBound ? "CPU Bound" : "I/O Bound"});
-
-        // Mostrar mensaje de éxito
         JOptionPane.showMessageDialog(null, "Process Created!", "Success", JOptionPane.INFORMATION_MESSAGE);
-
-        // Reiniciar campos
         resetFields();
+        updateButtonStates();
     }//GEN-LAST:event_AddProcessButtonActionPerformed
 
     public void updateInterface() {
         // Actualizar la tabla de procesos listos
         DefaultTableModel modeloListos = (DefaultTableModel) ProcessTable.getModel();
-        modeloListos.setRowCount(0); // Limpiar la tabla
+        modeloListos.setRowCount(0);
         for (int i = 0; i < simulator.getReadyQueue().size(); i++) {
             Process process = simulator.getReadyQueue().get(i);
             modeloListos.addRow(new Object[]{process.getName(), process.isCpuBound() ? "CPU Bound" : "I/O Bound"});
         }
-
-        // Actualizar la tabla de procesos bloqueados (si la tienes)
-        // ...
-
-        // Actualizar el ciclo global
-        // Puedes agregar un JLabel en tu interfaz para mostrar el ciclo global
-        // CicloGlobalLabel.setText("Ciclo Global: " + simulator.getCicloGlobal());
-}
+    }
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
             new MainView().setVisible(true);
         });
     }
     private void DeleteProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteProcessButtonActionPerformed
-        // TODO add your handling code here:
+       Process selectedProcess = getSelectedProcess(); 
+        if (selectedProcess != null) {
+            if (simulator.getReadyQueue().remove(selectedProcess)) { 
+                updateInterface();
+                JOptionPane.showMessageDialog(null, "Process deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                updateButtonStates();
+            } else {
+                JOptionPane.showMessageDialog(null, "Process not found in the queue.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "No process selected to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_DeleteProcessButtonActionPerformed
-
-    private void ProcessNameTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ProcessNameTextFieldActionPerformed
-        // Obtiene el texto del campo
-        
-    }//GEN-LAST:event_ProcessNameTextFieldActionPerformed
-
-    private void CicleDurationTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CicleDurationTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_CicleDurationTextField1ActionPerformed
 
     private void CPUBoundOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CPUBoundOptionActionPerformed
         disableJPanel(false);
@@ -425,13 +440,7 @@ public class MainView extends javax.swing.JFrame {
         char c = evt.getKeyChar();
         if(c < '0' || c > '9') evt.consume();
     }//GEN-LAST:event_CicleDurationTextField1KeyTyped
-
-    private void TwoProcessorsOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TwoProcessorsOptionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_TwoProcessorsOptionActionPerformed
     
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup ActiveProcessorsGroup;
     private javax.swing.JLabel ActiveProcessorsTextField;
