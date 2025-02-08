@@ -2,21 +2,28 @@ package igu;
 
 import java.awt.Component;
 import javax.swing.JOptionPane;
+import com.mycompany.proyecto1ssoo.Simulador;
+import com.mycompany.proyecto1ssoo.Proceso;
+import javax.swing.Timer;
+import javax.swing.table.DefaultTableModel; 
+import java.awt.event.ActionListener; 
+import java.awt.event.ActionEvent; 
 
 /**
  *
  * @author beacardozo
  */
 public class MainView extends javax.swing.JFrame {
+    private Simulador simulador;
 
     /**
      * Creates new form PantallaPrincipal
      */
     public MainView() {
-        // Inicializa la configuración de la ventana
         initComponents();
         setTitle("Process Simulator");
         disableJPanel(IOBoundOption.isSelected());
+        simulador = new Simulador(2);
     }
     
     public void disableJPanel (boolean value) {
@@ -301,7 +308,23 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_ClearProcessTableButtonActionPerformed
 
     private void StartSimulationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartSimulationButtonActionPerformed
-        // TODO add your handling code here:
+
+        int duracionCiclo = Integer.parseInt(CicleDurationTextField1.getText());
+        int numProcesadores = TwoProcessorsOption.isSelected() ? 2 : 3;
+
+        simulador = new Simulador(numProcesadores);
+
+        Timer timer = new Timer(duracionCiclo * 1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                simulador.ejecutarCiclo();
+                actualizarInterfaz();
+            }
+        });
+        timer.start();
+
+        // Deshabilitar el botón de inicio
+        StartSimulationButton.setEnabled(false);
     }//GEN-LAST:event_StartSimulationButtonActionPerformed
 
     private void IOBoundOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IOBoundOptionActionPerformed
@@ -309,22 +332,64 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_IOBoundOptionActionPerformed
 
     private void AddProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddProcessButtonActionPerformed
-       //Validate fields
-       String message = "Attention: Please fill in all required fields.";
+       // Validar campos
+        String message = "Attention: Please fill in all required fields.";
         if (ProcessNameTextField.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (IOBoundOption.isSelected()) {
-            if ((int) CyclesGenerateExcepSpinner.getValue() < 1 || (int) CyclesSatisfyExcepSpinner.getValue() < 1) {
-                JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.WARNING_MESSAGE);
-                return; 
-            }
-        }
+
+        // Obtener los valores de los campos
+        String nombre = ProcessNameTextField.getText();
+        boolean isCpuBound = CPUBoundOption.isSelected();
+        int ciclosExcepcion = (int) CyclesGenerateExcepSpinner.getValue();
+        int ciclosSatisfaccion = (int) CyclesSatisfyExcepSpinner.getValue();
+
+        // Imprimir detalles del proceso en la consola
+        System.out.println("Creando proceso:");
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Tipo: " + (isCpuBound ? "CPU Bound" : "I/O Bound"));
+        System.out.println("Ciclos para excepción: " + ciclosExcepcion);
+        System.out.println("Ciclos para satisfacer excepción: " + ciclosSatisfaccion);
+
+        // Crear el proceso
+        Proceso proceso = new Proceso(simulador.getCicloGlobal(), nombre, 10, isCpuBound, ciclosExcepcion, ciclosSatisfaccion);
+
+        // Agregar el proceso al simulador
+        simulador.agregarProceso(proceso);
+
+        // Actualizar la tabla de procesos
+        DefaultTableModel modelo = (DefaultTableModel) ProcessTable.getModel();
+        modelo.addRow(new Object[]{proceso.getNombre(), isCpuBound ? "CPU Bound" : "I/O Bound"});
+
+        // Mostrar mensaje de éxito
         JOptionPane.showMessageDialog(null, "Process Created!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+        // Reiniciar campos
         resetFields();
     }//GEN-LAST:event_AddProcessButtonActionPerformed
 
+    public void actualizarInterfaz() {
+        // Actualizar la tabla de procesos listos
+        DefaultTableModel modeloListos = (DefaultTableModel) ProcessTable.getModel();
+        modeloListos.setRowCount(0); // Limpiar la tabla
+        for (int i = 0; i < simulador.getColaListos().tamaño(); i++) {
+            Proceso proceso = simulador.getColaListos().obtener(i);
+            modeloListos.addRow(new Object[]{proceso.getNombre(), proceso.isCpuBound() ? "CPU Bound" : "I/O Bound"});
+        }
+
+        // Actualizar la tabla de procesos bloqueados (si la tienes)
+        // ...
+
+        // Actualizar el ciclo global
+        // Puedes agregar un JLabel en tu interfaz para mostrar el ciclo global
+        // CicloGlobalLabel.setText("Ciclo Global: " + simulador.getCicloGlobal());
+}
+    public static void main(String[] args) {
+        java.awt.EventQueue.invokeLater(() -> {
+            new MainView().setVisible(true);
+        });
+    }
     private void DeleteProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteProcessButtonActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_DeleteProcessButtonActionPerformed
