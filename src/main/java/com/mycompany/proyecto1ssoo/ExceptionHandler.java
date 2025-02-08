@@ -9,23 +9,23 @@ import igu.MainView;
  *
  * @author Rodrigo
  */
-public class ManejadorExcepciones extends Thread {
-    private Proceso proceso;
-    private int ciclosSatisfaccion;
+public class ExceptionHandler extends Thread {
+    private Process process;
+    private int satisfactionCycles;
     private MainView mainView;
 
-    public ManejadorExcepciones(Proceso proceso, int ciclosSatisfaccion, MainView mainView) {
-        this.proceso = proceso;
-        this.ciclosSatisfaccion = ciclosSatisfaccion;
+    public ExceptionHandler(Process process, int satisfactionCycles, MainView mainView) {
+        this.process = process;
+        this.satisfactionCycles = satisfactionCycles;
         this.mainView = mainView;
     }
 
     @Override
     public void run() {
         try {
-            Thread.sleep(ciclosSatisfaccion * 1000);
-            proceso.setEstado("Ready");
-            mainView.actualizarInterfaz(); 
+            Thread.sleep(satisfactionCycles * 1000);
+            process.setState("Ready");
+            mainView.updateInterface();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

@@ -2,8 +2,8 @@ package igu;
 
 import java.awt.Component;
 import javax.swing.JOptionPane;
-import com.mycompany.proyecto1ssoo.Simulador;
-import com.mycompany.proyecto1ssoo.Proceso;
+import com.mycompany.proyecto1ssoo.Simulator;
+import com.mycompany.proyecto1ssoo.Process;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel; 
 import java.awt.event.ActionListener; 
@@ -14,7 +14,7 @@ import java.awt.event.ActionEvent;
  * @author beacardozo
  */
 public class MainView extends javax.swing.JFrame {
-    private Simulador simulador;
+    private Simulator simulator;
 
     /**
      * Creates new form PantallaPrincipal
@@ -23,7 +23,7 @@ public class MainView extends javax.swing.JFrame {
         initComponents();
         setTitle("Process Simulator");
         disableJPanel(IOBoundOption.isSelected());
-        simulador = new Simulador(2);
+        simulator = new Simulator(2);
     }
     
     public void disableJPanel (boolean value) {
@@ -254,7 +254,13 @@ public class MainView extends javax.swing.JFrame {
         SystemSpecificationsPanel.add(PlanninPolicyComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 260, -1));
 
         ActiveProcessorsGroup.add(TwoProcessorsOption);
+        TwoProcessorsOption.setSelected(true);
         TwoProcessorsOption.setText("2");
+        TwoProcessorsOption.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                TwoProcessorsOptionActionPerformed(evt);
+            }
+        });
         SystemSpecificationsPanel.add(TwoProcessorsOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 120, -1, -1));
 
         ActiveProcessorsGroup.add(ThreeProcessorsOption);
@@ -309,21 +315,21 @@ public class MainView extends javax.swing.JFrame {
 
     private void StartSimulationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartSimulationButtonActionPerformed
 
-        int duracionCiclo = Integer.parseInt(CicleDurationTextField1.getText());
-        int numProcesadores = TwoProcessorsOption.isSelected() ? 2 : 3;
+        int cycleDuration = Integer.parseInt(CicleDurationTextField1.getText());
+        int numProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
 
-        simulador = new Simulador(numProcesadores);
+        simulator = new Simulator(numProcessors);
 
-        Timer timer = new Timer(duracionCiclo * 1000, new ActionListener() {
+        Timer timer = new Timer(cycleDuration * 1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                simulador.ejecutarCiclo();
-                actualizarInterfaz();
+                simulator.executeCycle();
+                updateInterface();
             }
         });
         timer.start();
 
-        // Deshabilitar el botón de inicio
+        
         StartSimulationButton.setEnabled(false);
     }//GEN-LAST:event_StartSimulationButtonActionPerformed
 
@@ -345,22 +351,22 @@ public class MainView extends javax.swing.JFrame {
         int ciclosExcepcion = (int) CyclesGenerateExcepSpinner.getValue();
         int ciclosSatisfaccion = (int) CyclesSatisfyExcepSpinner.getValue();
 
-        // Imprimir detalles del proceso en la consola
+        // Imprimir detalles del process en la consola
         System.out.println("Creando proceso:");
         System.out.println("Nombre: " + nombre);
         System.out.println("Tipo: " + (isCpuBound ? "CPU Bound" : "I/O Bound"));
         System.out.println("Ciclos para excepción: " + ciclosExcepcion);
         System.out.println("Ciclos para satisfacer excepción: " + ciclosSatisfaccion);
 
-        // Crear el proceso
-        Proceso proceso = new Proceso(simulador.getCicloGlobal(), nombre, 10, isCpuBound, ciclosExcepcion, ciclosSatisfaccion);
+        // Crear el process
+        Process process = new Process(simulator.getGlobalCycle(), nombre, 10, isCpuBound, ciclosExcepcion, ciclosSatisfaccion);
 
-        // Agregar el proceso al simulador
-        simulador.agregarProceso(proceso);
+        // Agregar el process al simulator
+        simulator.addProcess(process);
 
         // Actualizar la tabla de procesos
         DefaultTableModel modelo = (DefaultTableModel) ProcessTable.getModel();
-        modelo.addRow(new Object[]{proceso.getNombre(), isCpuBound ? "CPU Bound" : "I/O Bound"});
+        modelo.addRow(new Object[]{process.getName(), isCpuBound ? "CPU Bound" : "I/O Bound"});
 
         // Mostrar mensaje de éxito
         JOptionPane.showMessageDialog(null, "Process Created!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -369,13 +375,13 @@ public class MainView extends javax.swing.JFrame {
         resetFields();
     }//GEN-LAST:event_AddProcessButtonActionPerformed
 
-    public void actualizarInterfaz() {
+    public void updateInterface() {
         // Actualizar la tabla de procesos listos
         DefaultTableModel modeloListos = (DefaultTableModel) ProcessTable.getModel();
         modeloListos.setRowCount(0); // Limpiar la tabla
-        for (int i = 0; i < simulador.getColaListos().tamaño(); i++) {
-            Proceso proceso = simulador.getColaListos().obtener(i);
-            modeloListos.addRow(new Object[]{proceso.getNombre(), proceso.isCpuBound() ? "CPU Bound" : "I/O Bound"});
+        for (int i = 0; i < simulator.getReadyQueue().size(); i++) {
+            Process process = simulator.getReadyQueue().get(i);
+            modeloListos.addRow(new Object[]{process.getName(), process.isCpuBound() ? "CPU Bound" : "I/O Bound"});
         }
 
         // Actualizar la tabla de procesos bloqueados (si la tienes)
@@ -383,7 +389,7 @@ public class MainView extends javax.swing.JFrame {
 
         // Actualizar el ciclo global
         // Puedes agregar un JLabel en tu interfaz para mostrar el ciclo global
-        // CicloGlobalLabel.setText("Ciclo Global: " + simulador.getCicloGlobal());
+        // CicloGlobalLabel.setText("Ciclo Global: " + simulator.getCicloGlobal());
 }
     public static void main(String[] args) {
         java.awt.EventQueue.invokeLater(() -> {
@@ -419,6 +425,10 @@ public class MainView extends javax.swing.JFrame {
         char c = evt.getKeyChar();
         if(c < '0' || c > '9') evt.consume();
     }//GEN-LAST:event_CicleDurationTextField1KeyTyped
+
+    private void TwoProcessorsOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_TwoProcessorsOptionActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_TwoProcessorsOptionActionPerformed
     
 
 
