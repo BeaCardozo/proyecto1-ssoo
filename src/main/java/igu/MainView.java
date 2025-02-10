@@ -10,6 +10,10 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener; 
 import java.awt.event.ActionEvent; 
 import javax.swing.JPanel;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.awt.Component;
 
 /**
  *
@@ -108,7 +112,7 @@ public class MainView extends javax.swing.JFrame {
         PlanningPolicyLabel = new javax.swing.JLabel();
         CicleDurationLabel = new javax.swing.JLabel();
         ActiveProcessorsTextField = new javax.swing.JLabel();
-        CicleDurationTextField1 = new javax.swing.JTextField();
+        CycleDurationTextField = new javax.swing.JTextField();
         PlanninPolicyComboBox = new javax.swing.JComboBox<>();
         TwoProcessorsOption = new javax.swing.JRadioButton();
         ThreeProcessorsOption = new javax.swing.JRadioButton();
@@ -296,14 +300,14 @@ public class MainView extends javax.swing.JFrame {
         ActiveProcessorsTextField.setText("Number of Active Processors:");
         SystemSpecificationsPanel.add(ActiveProcessorsTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 200, -1));
 
-        CicleDurationTextField1.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
-        CicleDurationTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        CicleDurationTextField1.addKeyListener(new java.awt.event.KeyAdapter() {
+        CycleDurationTextField.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        CycleDurationTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        CycleDurationTextField.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
-                CicleDurationTextField1KeyTyped(evt);
+                CycleDurationTextFieldKeyTyped(evt);
             }
         });
-        SystemSpecificationsPanel.add(CicleDurationTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 160, -1));
+        SystemSpecificationsPanel.add(CycleDurationTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 160, -1));
 
         PlanninPolicyComboBox.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         PlanninPolicyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "FCFS - First-Come, First-Served", "Round Robin", "SPN", "HRRN", "SJF - Shortest Job First", " " }));
@@ -521,18 +525,19 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_ClearProcessTableButtonActionPerformed
 
     private void StartSimulationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartSimulationButtonActionPerformed
-    if (CicleDurationTextField1.getText().trim().isEmpty()) {
+    if (CycleDurationTextField.getText().trim().isEmpty()) {
         // Mostrar un mensaje de advertencia (puedes usar un JOptionPane)
         JOptionPane.showMessageDialog(this, "Please enter a Cycle Duration.", "Warning", JOptionPane.WARNING_MESSAGE);
         return; // Salir de la función si el campo está vacío
     } else {
+            saveToFile();
             disableJPanel(ProcessDetailsPanel, false);
             disableJPanel(IOBoundPanel, false);
             ProcessTable.setEnabled(false);
             enablePanels(true);
             StartSimulationButton.setText("Stop Simulation"); // Cambiar el texto
             StartSimulationButton.setBackground(Color.RED);
-            int cycleDuration = Integer.parseInt(CicleDurationTextField1.getText());
+            int cycleDuration = Integer.parseInt(CycleDurationTextField.getText());
             int numProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
             simulator = new Simulator(numProcessors);
             Timer timer = new Timer(cycleDuration * 1000, new ActionListener() {
@@ -628,10 +633,42 @@ public class MainView extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_ProcessNameTextFieldKeyTyped
 
-    private void CicleDurationTextField1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CicleDurationTextField1KeyTyped
+    private void CycleDurationTextFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CycleDurationTextFieldKeyTyped
         char c = evt.getKeyChar();
         if(c < '0' || c > '9') evt.consume();
-    }//GEN-LAST:event_CicleDurationTextField1KeyTyped
+    }//GEN-LAST:event_CycleDurationTextFieldKeyTyped
+    
+    
+    //TXT CONFIG
+    private void saveToFile() {
+    String filename = "simulation_results.txt";
+
+    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+        writer.write("#Datos de la simulación");
+        writer.newLine();
+
+        writer.write("#PROCESOS");
+        writer.newLine();
+
+        simulator.getReadyQueue().iterateProcesses(writer);
+
+        writer.write("#CONFIGURACION");
+        writer.newLine();
+
+        writer.write("Cycle Duration: " + CycleDurationTextField.getText().trim());
+        writer.newLine();
+        writer.write("Number of Active Processors: " + 
+                     (TwoProcessorsOption.isSelected() ? "2" : "3"));
+        writer.newLine();
+        writer.write("Planning Policy: " + PlanninPolicyComboBox.getSelectedItem());
+        writer.newLine();
+
+        JOptionPane.showMessageDialog(null, "Datos guardados en " + filename);
+    } catch (IOException ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(null, "Error al guardar los datos.");
+    }
+}
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup ActiveProcessorsGroup;
@@ -641,9 +678,9 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JList<String> BlockedQueueList;
     private javax.swing.JRadioButton CPUBoundOption;
     private javax.swing.JLabel CicleDurationLabel;
-    private javax.swing.JTextField CicleDurationTextField1;
     private javax.swing.JButton ClearProcessTableButton;
     private javax.swing.JPanel ConfigPanel;
+    private javax.swing.JTextField CycleDurationTextField;
     private javax.swing.JLabel CyclesGenerateExcepLabel;
     private javax.swing.JSpinner CyclesGenerateExcepSpinner;
     private javax.swing.JLabel CyclesSatisfyExcepLabel;

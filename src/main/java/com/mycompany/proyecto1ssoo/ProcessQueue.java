@@ -1,5 +1,8 @@
 package com.mycompany.proyecto1ssoo;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+
 /**
  *
  * @author Rodrigo
@@ -89,6 +92,32 @@ public class ProcessQueue {
             System.out.println("Index out of range.");
             return null;
         }
+    }
+    
+    public void iterateProcesses(BufferedWriter writer) throws IOException {
+    if (isEmpty()) {
+        writer.write("No hay procesos en la cola.");
+        writer.newLine();
+        return;
+    }
+
+    int i = front;
+    while (true) {
+        Process process = processes[i];
+        if (process != null) {
+            writer.write(process.getId() + ", " +              
+                         process.getName() + ", " +            
+                         process.getInstructions() + ", " +    
+                         (process.isCpuBound() ? "true" : "false") + ", " + 
+                         process.getExceptionCycles() + ", " +  
+                         process.getSatisfactionCycles() + ", " + 
+                         process.getProgramCounter() + ", " +   
+                         process.getState());             
+            writer.newLine();
+        }
+        if (i == end) break; 
+        i = (i + 1) % capacity; 
+    }
     }
 }
 
