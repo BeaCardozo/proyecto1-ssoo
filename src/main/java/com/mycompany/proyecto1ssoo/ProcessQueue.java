@@ -86,13 +86,12 @@ public class ProcessQueue {
     }
 
     public Process get(int index) {
-        if (index >= 0 && index < size()) {
-            return processes[front + index];
-        } else {
-            System.out.println("Index out of range.");
-            return null;
-        }
+    if (index >= 0 && index < size()) {
+        return processes[front + index]; // Asegúrate de manejar correctamente los índices
+    } else {
+        return null; // Retornar null si el índice está fuera de rango
     }
+}
     
     public void iterateProcesses(BufferedWriter writer) throws IOException {
     if (isEmpty()) {

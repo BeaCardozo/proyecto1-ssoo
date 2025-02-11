@@ -1,7 +1,11 @@
 #Datos de la simulación
 #PROCESOS
-No hay procesos en la cola.
+0, Proceso 1, 10, false, 1, 1, 0, Ready
+0, p2, 10, false, 1, 1, 0, Ready
+0, p3, 10, false, 1, 1, 0, Ready
+0, p4, 10, false, 1, 1, 0, Ready
+0, p5, 10, false, 1, 1, 0, Ready
 #CONFIGURACION
-Cycle Duration: 200
-Number of Active Processors: 3
-Planning Policy: Round Robin
+Cycle Duration: 1111
+Number of Active Processors: 2
+Planning Policy: FCFS - First-Come, First-Served
