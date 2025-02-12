@@ -8,7 +8,7 @@ public class Process {
     private int exceptionCycles;
     private int satisfactionCycles;
     private int programCounter;
-    private String state;
+    private ProcessState state;
 
     public Process(int id, String name, int instructions, boolean isCpuBound, int exceptionCycles, int satisfactionCycles) {
         this.id = id;
@@ -18,7 +18,7 @@ public class Process {
         this.exceptionCycles = exceptionCycles;
         this.satisfactionCycles = satisfactionCycles;
         this.programCounter = 0;
-        this.state = "Ready";
+        this.state = ProcessState.READY;
     }
 
     public int getId() { return id; }
@@ -28,9 +28,9 @@ public class Process {
     public int getExceptionCycles() { return exceptionCycles; }
     public int getSatisfactionCycles() { return satisfactionCycles; }
     public int getProgramCounter() { return programCounter; }
-    public String getState() { return state; }
+    public ProcessState getState() { return state; }
 
-    public void setState(String state) { this.state = state; }
+    public void setState(ProcessState state) { this.state = state; }
     public void incrementProgramCounter() { this.programCounter++; }
 
     public boolean hasFinished() {

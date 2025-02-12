@@ -24,7 +24,7 @@ public class ExceptionHandler extends Thread {
     public void run() {
         try {
             Thread.sleep(satisfactionCycles * 1000);
-            process.setState("Ready");
+            process.setState(ProcessState.RUNNING);
             mainView.updateInterface();
         } catch (InterruptedException e) {
             e.printStackTrace();

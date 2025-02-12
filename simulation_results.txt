@@ -1,11 +1,15 @@
 #Datos de la simulación
 #PROCESOS
-0, Proceso 1, 10, false, 1, 1, 0, Ready
-0, p2, 10, false, 1, 1, 0, Ready
-0, p3, 10, false, 1, 1, 0, Ready
-0, p4, 10, false, 1, 1, 0, Ready
-0, p5, 10, false, 1, 1, 0, Ready
+0, p1, 10, false, 1, 1, 0, READY
+0, p2, 10, false, 1, 1, 0, READY
+0, p3, 10, false, 1, 1, 0, READY
+0, p4, 10, false, 1, 1, 0, READY
+0, p5, 10, false, 1, 1, 0, READY
+0, p6, 10, false, 1, 1, 0, READY
+0, p7, 10, false, 1, 1, 0, READY
+0, p8, 10, false, 1, 1, 0, READY
+0, p9, 10, false, 1, 1, 0, READY
 #CONFIGURACION
-Cycle Duration: 1111
+Cycle Duration: 111
 Number of Active Processors: 2
 Planning Policy: FCFS - First-Come, First-Served

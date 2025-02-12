@@ -26,7 +26,7 @@ public class Processor {
     public void assignProcess(Process process) {
         this.currentProcess = process;
         this.isIdle = false;
-        process.setState("Running");
+        process.setState(ProcessState.RUNNING);
     }
 
     public void releaseProcessor() {

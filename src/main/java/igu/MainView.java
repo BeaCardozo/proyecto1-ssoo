@@ -1,10 +1,9 @@
 package igu;
 
-import java.awt.Component;
 import javax.swing.JOptionPane;
 import com.mycompany.proyecto1ssoo.Simulator;
 import com.mycompany.proyecto1ssoo.Process;
-import com.mycompany.proyecto1ssoo.ProcessPCBPanel;
+import com.mycompany.proyecto1ssoo.ProcessPCB;
 import com.mycompany.proyecto1ssoo.ProcessQueue;
 import java.awt.Color;
 import javax.swing.Timer;
@@ -16,7 +15,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.Component;
-import javax.swing.BoxLayout;
 
 /**
  *
@@ -41,7 +39,7 @@ public class MainView extends javax.swing.JFrame {
         disableJPanel(SimulationDetailsPanel, value);
         disableJPanel(DetailsPanel,value);
         disableJPanel(QueuePanel,value);
-        disableJPanel(PCBPanel,value);
+        disableJPanel(PCBMainPanel,value);
         ProccesesPerProcessorsTable.setEnabled(value);
         ReadyQueueList.setEnabled(value);
         BlockedQueueList.setEnabled(value);
@@ -126,7 +124,7 @@ public class MainView extends javax.swing.JFrame {
         GraphicsPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         SimulationDetailsPanel = new javax.swing.JPanel();
-        PCBPanel = new javax.swing.JPanel();
+        PCBMainPanel = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
         DetailsPanel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
@@ -368,12 +366,12 @@ public class MainView extends javax.swing.JFrame {
         SimulationDetailsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 14))); // NOI18N
         SimulationDetailsPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        PCBPanel.setBackground(new java.awt.Color(255, 255, 255));
-        PCBPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Process Control Blocks", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 13))); // NOI18N
-        PCBPanel.setLayout(new javax.swing.BoxLayout(PCBPanel, javax.swing.BoxLayout.LINE_AXIS));
-        PCBPanel.add(jSeparator1);
+        PCBMainPanel.setBackground(new java.awt.Color(255, 255, 255));
+        PCBMainPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Process Control Blocks", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 13))); // NOI18N
+        PCBMainPanel.setAutoscrolls(true);
+        PCBMainPanel.add(jSeparator1);
 
-        SimulationDetailsPanel.add(PCBPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 980, 250));
+        SimulationDetailsPanel.add(PCBMainPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 980, 250));
 
         DetailsPanel.setBackground(new java.awt.Color(255, 255, 255));
         DetailsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Details", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 13))); // NOI18N
@@ -506,7 +504,7 @@ public class MainView extends javax.swing.JFrame {
         return;
     } else {
 
-        PCBPanel.removeAll();
+        PCBMainPanel.removeAll();
         
   
         ProcessQueue readyQueue = simulator.getReadyQueue();
@@ -516,15 +514,15 @@ public class MainView extends javax.swing.JFrame {
             for (int i = 0; i < readyQueue.size(); i++) {
                 Process process = readyQueue.get(i);
                 if (process != null) {
-                    ProcessPCBPanel processPanel = new ProcessPCBPanel(process);
-                    PCBPanel.add(processPanel); // Añade el panel al PCBPanel
+                    ProcessPCB processPanel = new ProcessPCB(process);
+                    PCBMainPanel.add(processPanel); 
                 }
             }
         }
 
         
-        PCBPanel.revalidate(); 
-        PCBPanel.repaint();
+        PCBMainPanel.revalidate(); 
+        PCBMainPanel.repaint();
 
    
         saveToFile();
@@ -693,7 +691,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JRadioButton IOBoundOption;
     private javax.swing.JPanel IOBoundPanel;
     private javax.swing.JLabel ModeLabel;
-    private javax.swing.JPanel PCBPanel;
+    private javax.swing.JPanel PCBMainPanel;
     private javax.swing.JComboBox<String> PlanninPolicyComboBox;
     private javax.swing.JLabel PlanningPolicyLabel;
     private javax.swing.JTable ProccesesPerProcessorsTable;
