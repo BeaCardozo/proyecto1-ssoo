@@ -24,7 +24,7 @@ public class ProcessPCB extends javax.swing.JPanel {
         ProcessStatusLabel.setText(process.getState().name());
         ProcessTypeLabel.setText(process.isCpuBound() ? "CPU BOUND" : "I/O BOUND");
         ProcessPCLabel.setText(String.valueOf(process.getProgramCounter()));
-        ProcessMARLabel.setText("0");
+        ProcessMARLabel.setText(String.valueOf(process.getMAR()));
 
       
     }
@@ -104,7 +104,7 @@ public class ProcessPCB extends javax.swing.JPanel {
         ProcessMARLabel.setText("mar");
         ProcessPCBSquare.add(ProcessMARLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 160, -1, -1));
 
-        add(ProcessPCBSquare, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 180, 200));
+        add(ProcessPCBSquare, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 180, 190));
     }// </editor-fold>//GEN-END:initComponents
 
 

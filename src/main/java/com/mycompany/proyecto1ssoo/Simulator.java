@@ -10,16 +10,27 @@ public class Simulator {
     private Processor[] processors;
     private int globalCycle;
     private String schedulingPolicy;
+    private int numProcessors; 
 
     public Simulator(int numProcessors) {
-        this.readyQueue = new ProcessQueue(100); 
-        this.blockedQueue = new ProcessQueue(100); 
+        this.numProcessors = numProcessors;  
+        this.readyQueue = new ProcessQueue(100);
+        this.blockedQueue = new ProcessQueue(100);
         this.processors = new Processor[numProcessors];
         for (int i = 0; i < numProcessors; i++) {
             processors[i] = new Processor(i);
         }
         this.globalCycle = 0;
-        this.schedulingPolicy = "FCFS"; // Default is FCFS (First-Come, First-Served) 
+        this.schedulingPolicy = "FCFS";  //Arreglar esto a dato dinámico
+    }
+
+    // Método para cambiar el número de procesadores
+    public void setNumProcessors(int numProcessors) {
+        this.numProcessors = numProcessors; 
+    }
+    
+    public int getNumProcessors() {
+        return numProcessors; 
     }
 
     public void addProcess(Process process) {

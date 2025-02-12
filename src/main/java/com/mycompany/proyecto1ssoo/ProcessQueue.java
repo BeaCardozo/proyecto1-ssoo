@@ -87,9 +87,9 @@ public class ProcessQueue {
 
     public Process get(int index) {
     if (index >= 0 && index < size()) {
-        return processes[front + index]; // Asegúrate de manejar correctamente los índices
+        return processes[front + index]; 
     } else {
-        return null; // Retornar null si el índice está fuera de rango
+        return null; 
     }
 }
     
@@ -111,6 +111,7 @@ public class ProcessQueue {
                          process.getExceptionCycles() + ", " +  
                          process.getSatisfactionCycles() + ", " + 
                          process.getProgramCounter() + ", " +   
+                         process.getMAR() + ", " + 
                          process.getState());             
             writer.newLine();
         }
