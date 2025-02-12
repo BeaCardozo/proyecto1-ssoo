@@ -1,7 +1,11 @@
 package com.mycompany.proyecto1ssoo;
 
+
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.DefaultListModel;
 
 /**
  *
@@ -86,13 +90,26 @@ public class ProcessQueue {
     }
 
     public Process get(int index) {
-    if (index >= 0 && index < size()) {
-        return processes[front + index]; 
-    } else {
-        return null; 
+        if (index >= 0 && index < size()) {
+            return processes[front + index]; 
+        } else {
+            return null; 
+        }
     }
-}
     
+    
+   public DefaultListModel<String> getProcessNames() {
+    DefaultListModel<String> processNamesModel = new DefaultListModel<>();
+    for (int i = 0; i < processes.length; i++) {
+        Process process = processes[i];
+        if (process != null) {
+            processNamesModel.addElement(process.getName());
+        }
+    }
+
+    return processNamesModel;
+    }
+
     public void iterateProcesses(BufferedWriter writer) throws IOException {
     if (isEmpty()) {
         writer.write("No hay procesos en la cola.");

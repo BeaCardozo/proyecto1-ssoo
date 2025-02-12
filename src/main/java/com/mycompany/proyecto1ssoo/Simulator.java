@@ -7,6 +7,7 @@ package com.mycompany.proyecto1ssoo;
 public class Simulator {
     private ProcessQueue readyQueue;
     private ProcessQueue blockedQueue;
+    private ProcessQueue finishedQueue;
     private Processor[] processors;
     private int globalCycle;
     private String schedulingPolicy;
@@ -16,6 +17,7 @@ public class Simulator {
         this.numProcessors = numProcessors;  
         this.readyQueue = new ProcessQueue(100);
         this.blockedQueue = new ProcessQueue(100);
+        this.finishedQueue = new ProcessQueue(100);
         this.processors = new Processor[numProcessors];
         for (int i = 0; i < numProcessors; i++) {
             processors[i] = new Processor(i);
@@ -64,4 +66,5 @@ public class Simulator {
     public String getSchedulingPolicy() { return schedulingPolicy; }
     public ProcessQueue getReadyQueue() { return readyQueue; }
     public ProcessQueue getBlockedQueue() { return blockedQueue; }
+    public ProcessQueue getFinishedQueue() { return finishedQueue; }
 }

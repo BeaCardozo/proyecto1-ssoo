@@ -15,6 +15,8 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.Component;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 
 /**
  *
@@ -91,7 +93,7 @@ public class MainView extends javax.swing.JFrame {
         BlockedQueueLabel = new javax.swing.JLabel();
         FinishedQueueLabel = new javax.swing.JLabel();
         jScrollPane5 = new javax.swing.JScrollPane();
-        ReadyQueueList = new javax.swing.JList<>();
+        ReadyQueueList = new javax.swing.JList();
         jScrollPane6 = new javax.swing.JScrollPane();
         FinishedQueueList = new javax.swing.JList<>();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -396,11 +398,6 @@ public class MainView extends javax.swing.JFrame {
         QueuePanel.add(FinishedQueueLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 50, 90, -1));
 
         ReadyQueueList.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
-        ReadyQueueList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Proceso 1", "Proceso 5" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         ReadyQueueList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         ReadyQueueList.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         ReadyQueueList.setDebugGraphicsOptions(javax.swing.DebugGraphics.NONE_OPTION);
@@ -411,11 +408,6 @@ public class MainView extends javax.swing.JFrame {
         QueuePanel.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 70, 90, 170));
 
         FinishedQueueList.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
-        FinishedQueueList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Proceso 2", "Proceso 4" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         FinishedQueueList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         FinishedQueueList.setSelectionBackground(null);
         jScrollPane6.setViewportView(FinishedQueueList);
@@ -423,11 +415,6 @@ public class MainView extends javax.swing.JFrame {
         QueuePanel.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 70, 90, 170));
 
         BlockedQueueList.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
-        BlockedQueueList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "Proceso 3" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane2.setViewportView(BlockedQueueList);
 
         QueuePanel.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 70, 90, 170));
@@ -484,7 +471,7 @@ public class MainView extends javax.swing.JFrame {
             StartSimulationButton.setForeground(Color.BLACK);
         } else {
             saveToFile(); // Guardar procesos y configuración en txt
-            updatePCBS(); // Mostrar los bloques de procesos
+            updatePCBSandQueues(); // Mostrar los bloques de procesos
 
             disablePanels(false); 
             enablePanels(true); 
@@ -681,7 +668,10 @@ public class MainView extends javax.swing.JFrame {
     }
     
     //Mostrar o actualizar PCBs
-    private void updatePCBS(){
+    private void updatePCBSandQueues(){
+        ReadyQueueList.setModel(simulator.getReadyQueue().getProcessNames());
+        BlockedQueueList.setModel(simulator.getBlockedQueue().getProcessNames());
+        FinishedQueueList.setModel(simulator.getFinishedQueue().getProcessNames());
         PCBMainPanel.removeAll();
          System.out.println("is queue empty?" + simulator.getReadyQueue().size());
         ProcessQueue readyQueue = simulator.getReadyQueue();
@@ -698,6 +688,8 @@ public class MainView extends javax.swing.JFrame {
         PCBMainPanel.revalidate(); 
         PCBMainPanel.repaint();
     }
+    
+    
     
     //Txt config
     private void saveToFile() {
@@ -770,7 +762,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JLabel ProcessesProLabel;
     private javax.swing.JPanel QueuePanel;
     private javax.swing.JLabel ReadyQueueLabel;
-    private javax.swing.JList<String> ReadyQueueList;
+    private javax.swing.JList ReadyQueueList;
     private javax.swing.JPanel SimulationDetailsPanel;
     private javax.swing.JPanel SimulationPanel;
     private javax.swing.JButton StartSimulationButton;
