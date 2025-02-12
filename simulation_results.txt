@@ -1,8 +1,10 @@
 #Simulation Data
 #PROCESS
-1409, Hola, 12, false, 1, 1, 1, 0, READY
+3322, P1, 1111, false, 1, 1, 1, 0, READY
+1798, P2, 2, true, 1, 1, 1, 0, READY
+5938, P3, 15, false, 1, 1, 1, 0, READY
 
 #CONFIG
-Cycle Duration: 11
+Cycle Duration: 1111
 Number of Active Processors: 2
 Planning Policy: FCFS - First-Come, First-Served

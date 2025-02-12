@@ -318,7 +318,7 @@ public class MainView extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(153, 153, 153));
         jLabel1.setText("No information available yet.");
-        SystemPerfomanceMetricsPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 110, -1, -1));
+        SystemPerfomanceMetricsPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 110, -1, -1));
 
         SimulationPanel.add(SystemPerfomanceMetricsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 630, 490, 250));
 
@@ -662,6 +662,11 @@ public class MainView extends javax.swing.JFrame {
         //Mostrar estadisticas hasta el momento y resto de logica que debemos implementar
         isSimulationActive = false;
         PCBMainPanel.removeAll(); //Limpiar PCBs
+        //Limpiar listas
+        ReadyQueueList.setModel(new DefaultListModel<>());
+        BlockedQueueList.setModel(new DefaultListModel<>());
+        FinishedQueueList.setModel(new DefaultListModel<>());
+        disableJPanel(IOBoundPanel, IOBoundOption.isSelected());
         disableJPanel(ProcessDetailsPanel, true);
         ProcessTable.setEnabled(true); 
         enablePanels(false);
@@ -669,6 +674,11 @@ public class MainView extends javax.swing.JFrame {
     
     //Mostrar o actualizar PCBs
     private void updatePCBSandQueues(){
+        //Limpiar lista de nombres
+        simulator.getReadyQueue().getProcessNames().clear();
+        simulator.getBlockedQueue().getProcessNames().clear();
+        simulator.getFinishedQueue().getProcessNames().clear();
+        //Set modelos de las JList
         ReadyQueueList.setModel(simulator.getReadyQueue().getProcessNames());
         BlockedQueueList.setModel(simulator.getBlockedQueue().getProcessNames());
         FinishedQueueList.setModel(simulator.getFinishedQueue().getProcessNames());
