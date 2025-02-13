@@ -34,6 +34,7 @@ public class Processor {
         if (currentProcess != null) {
             currentProcess.incrementProgramCounter();
             if (currentProcess.hasFinished()) {
+                currentProcess.setState(ProcessState.FINISHED);
                 releaseProcessor();
             }
         }

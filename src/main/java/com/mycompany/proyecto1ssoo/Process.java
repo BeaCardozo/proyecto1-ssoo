@@ -2,10 +2,11 @@ package com.mycompany.proyecto1ssoo;
 
 import java.util.Random;
 
-public class Process {
+public class Process{
     private int id;
     private String name;
-    private int instructions;
+    private int instructions; //Como rafaga de CPU
+    private int remainingInstructions;//rafaga restante, lo que queda para que termine de ejecutarse
     private boolean isCpuBound;
     private int exceptionCycles;
     private int satisfactionCycles;
@@ -31,9 +32,11 @@ public class Process {
         return 1000 + random.nextInt(9000); 
     }
 
+
     public int getId() { return id; }
     public String getName() { return name; }
     public int getInstructions() { return instructions; }
+    public int getRemainingInstructions() { return instructions; }
     public boolean isCpuBound() { return isCpuBound; }
     public int getExceptionCycles() { return exceptionCycles; }
     public int getSatisfactionCycles() { return satisfactionCycles; }
@@ -47,4 +50,5 @@ public class Process {
     public boolean hasFinished() {
         return programCounter >= instructions;
     }
+
 }

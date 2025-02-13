@@ -1,5 +1,7 @@
 package igu;
 
+import com.mycompany.proyecto1ssoo.TableProcessors;
+
 import javax.swing.JOptionPane;
 import com.mycompany.proyecto1ssoo.Simulator;
 import com.mycompany.proyecto1ssoo.Process;
@@ -16,7 +18,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.Component;
 import javax.swing.DefaultListModel;
-import javax.swing.JList;
 
 /**
  *
@@ -25,14 +26,19 @@ import javax.swing.JList;
 public class MainView extends javax.swing.JFrame {
     private Simulator simulator;
     private boolean isSimulationActive = false; 
-
+    private Timer timer;
+    
+    
     public MainView() {
         initComponents();
-        simulator = new Simulator(2); 
+        simulator = new Simulator(3); 
         updateButtonStates(); 
         setTitle("Process Simulator");
         disableJPanel(IOBoundPanel, IOBoundOption.isSelected());
         enablePanels(false);
+        GlobalClockSimulationLabel.setText("Global Clock Cycle Number: 0");
+        ExecutionModeLabel.setText("");
+
     }
 
     /**
@@ -82,12 +88,11 @@ public class MainView extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         SimulationDetailsPanel = new javax.swing.JPanel();
         DetailsPanel = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        ProccesesPerProcessorsTable = new javax.swing.JTable();
         ExecutionModeLabel = new javax.swing.JLabel();
         ProcessesProLabel = new javax.swing.JLabel();
-        GlobalClockLabel = new javax.swing.JLabel();
+        GlobalClockSimulationLabel = new javax.swing.JLabel();
         ModeLabel = new javax.swing.JLabel();
+        TableProcessorsPanel = new javax.swing.JPanel();
         QueuePanel = new javax.swing.JPanel();
         ReadyQueueLabel = new javax.swing.JLabel();
         BlockedQueueLabel = new javax.swing.JLabel();
@@ -341,43 +346,25 @@ public class MainView extends javax.swing.JFrame {
         DetailsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Details", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 13))); // NOI18N
         DetailsPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        ProccesesPerProcessorsTable.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
-        ProccesesPerProcessorsTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null}
-            },
-            new String [] {
-                "Processor 1", "Processor 2", "Processor 3"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        jScrollPane3.setViewportView(ProccesesPerProcessorsTable);
-
-        DetailsPanel.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, 380, 70));
-
         ExecutionModeLabel.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         ExecutionModeLabel.setForeground(new java.awt.Color(51, 204, 0));
-        ExecutionModeLabel.setText("Operative System");
+        ExecutionModeLabel.setText("...");
         DetailsPanel.add(ExecutionModeLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 100, 270, -1));
 
         ProcessesProLabel.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         ProcessesProLabel.setText("Current Processes Per Processor:");
         DetailsPanel.add(ProcessesProLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, 380, -1));
 
-        GlobalClockLabel.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
-        GlobalClockLabel.setText("Global Clock Cycle Number:");
-        DetailsPanel.add(GlobalClockLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 200, -1));
+        GlobalClockSimulationLabel.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
+        GlobalClockSimulationLabel.setText("Global Clock Cycle Number:");
+        DetailsPanel.add(GlobalClockSimulationLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 370, -1));
 
         ModeLabel.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         ModeLabel.setText("Execution Mode:");
         DetailsPanel.add(ModeLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 100, 110, -1));
+
+        TableProcessorsPanel.setBackground(new java.awt.Color(255, 255, 255));
+        DetailsPanel.add(TableProcessorsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, 380, 90));
 
         SimulationDetailsPanel.add(DetailsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 440, 270));
 
@@ -449,7 +436,7 @@ public class MainView extends javax.swing.JFrame {
         );
 
         if (response == JOptionPane.YES_OPTION) {
-            simulator.getReadyQueue().clear(); 
+            simulator.getGeneralQueue().clear(); 
             updateInterface(); 
             updateButtonStates();
             JOptionPane.showMessageDialog(null, "Process queue cleared successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
@@ -461,42 +448,61 @@ public class MainView extends javax.swing.JFrame {
     //Boton de Iniciar Simulacion o Finalizar la Simulación
     private void StartSimulationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartSimulationButtonActionPerformed
         if (CycleDurationTextField.getText().trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Please enter a Cycle Duration.", "Warning", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        if (isSimulationActive) {
-            stopSimulation(); 
-            StartSimulationButton.setText("Start Simulation");
-            StartSimulationButton.setBackground(new Color(181,241,169));
-            StartSimulationButton.setForeground(Color.BLACK);
-        } else {
-            saveToFile(); // Guardar procesos y configuración en txt
-            updatePCBSandQueues(); // Mostrar los bloques de procesos
+        JOptionPane.showMessageDialog(null, "Please enter a Cycle Duration.", "Warning", JOptionPane.WARNING_MESSAGE);
+        return;
+    }
 
-            disablePanels(false); 
-            enablePanels(true); 
+    if (isSimulationActive) { 
+        // Detener la simulación
+        stopSimulation(); 
+        isSimulationActive = false;
 
-            // Cambiar el botón
-            StartSimulationButton.setText("Stop Simulation");
-            StartSimulationButton.setBackground(Color.RED); 
-            StartSimulationButton.setForeground(Color.WHITE); 
+        StartSimulationButton.setText("Start Simulation");
+        StartSimulationButton.setBackground(new Color(241, 241, 169));
+        StartSimulationButton.setForeground(Color.BLACK);
+        return; // Terminar el método si está deteniendo la simulación
+    } else { 
+        saveToFile(); 
+        updatePCBSandQueues(); 
+        disablePanels(false); 
+        enablePanels(true);
+        
+        
+        // Cambiar el botón a "Stop Simulation"
+        StartSimulationButton.setText("Stop Simulation");
+        StartSimulationButton.setBackground(Color.RED);
+        StartSimulationButton.setForeground(Color.WHITE);
+        
+        int cycleDuration = Integer.parseInt(CycleDurationTextField.getText());
+        int numProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
+        
+        
+        
+        simulator.setNumProcessors(numProcessors); // Asignar número de procesadores
 
-            int cycleDuration = Integer.parseInt(CycleDurationTextField.getText());
-            int numProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
-            simulator.setNumProcessors(numProcessors);
-            System.out.println("Tantos procesadores:" + simulator.getNumProcessors());
-
-            // Crear y iniciar el temporizador
-            Timer timer = new Timer(cycleDuration * 1000, new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    simulator.executeCycle();
-                    updateInterface();
+        // Crear y empezar el temporizador
+        timer = new Timer(cycleDuration * 1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (!isSimulationActive) { 
+                    timer.stop(); 
+                    simulator.setGlobalCycle(0);
+                    return; 
                 }
-            });
-            timer.start();
-            isSimulationActive = true; 
-        }
+                simulator.executeCycle(); 
+                GlobalClockSimulationLabel.setText("Global Clock Cycle Number: " + simulator.getGlobalCycle());
+                updatePCBSandQueues(); 
+                
+                TableProcessorsPanel.removeAll();
+                TableProcessors table = new TableProcessors(simulator.updateProcessTable());
+                TableProcessorsPanel.add(table);
+
+            }
+        });
+
+        timer.start(); // Iniciar el temporizador
+        isSimulationActive = true; 
+    }
     }//GEN-LAST:event_StartSimulationButtonActionPerformed
 
     private void IOBoundOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IOBoundOptionActionPerformed
@@ -513,7 +519,7 @@ public class MainView extends javax.swing.JFrame {
         }
 
         String name = ProcessNameTextField.getText();
-        if (simulator.getReadyQueue().containsName(name)) { 
+        if (simulator.getGeneralQueue().containsName(name)) { 
             JOptionPane.showMessageDialog(null, "A process with that name already exists.", "Error", JOptionPane.WARNING_MESSAGE);
             return; 
         }
@@ -547,7 +553,7 @@ public class MainView extends javax.swing.JFrame {
     private void DeleteProcessButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DeleteProcessButtonActionPerformed
        Process selectedProcess = getSelectedProcess(); 
         if (selectedProcess != null) {
-            if (simulator.getReadyQueue().remove(selectedProcess)) { 
+            if (simulator.getGeneralQueue().remove(selectedProcess)) { 
                 updateInterface();
                 JOptionPane.showMessageDialog(null, "Process deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
                 updateButtonStates();
@@ -588,8 +594,8 @@ public class MainView extends javax.swing.JFrame {
     public void updateInterface() {
         DefaultTableModel modeloListos = (DefaultTableModel) ProcessTable.getModel();
         modeloListos.setRowCount(0);
-        for (int i = 0; i < simulator.getReadyQueue().size(); i++) {
-            Process process = simulator.getReadyQueue().get(i);
+        for (int i = 0; i < simulator.getGeneralQueue().size(); i++) { //revisar esto
+            Process process = simulator.getGeneralQueue().get(i);
             modeloListos.addRow(new Object[]{process.getName(), process.isCpuBound() ? "CPU Bound" : "I/O Bound"});
         }
     }
@@ -606,7 +612,6 @@ public class MainView extends javax.swing.JFrame {
         disableJPanel(DetailsPanel,value);
         disableJPanel(QueuePanel,value);
         disableJPanel(PCBMainPanel,value);
-        ProccesesPerProcessorsTable.setEnabled(value);
         ReadyQueueList.setEnabled(value);
         BlockedQueueList.setEnabled(value);
         FinishedQueueList.setEnabled(value);
@@ -627,7 +632,7 @@ public class MainView extends javax.swing.JFrame {
         }
     }
     
-    //Devolver spinners a su valor original
+    //Devolver spinner a su valor original
     private void resetSpinners() {
         CyclesGenerateExcepSpinner.setValue(1);
         CyclesSatisfyExcepSpinner.setValue(1);
@@ -642,7 +647,7 @@ public class MainView extends javax.swing.JFrame {
     
     //Actualizar el estado de los botones
     private void updateButtonStates() {
-        boolean isQueueEmpty = simulator.getReadyQueue().isEmpty();
+        boolean isQueueEmpty = simulator.getGeneralQueue().isEmpty();
         ClearProcessTableButton.setEnabled(!isQueueEmpty);
         DeleteProcessButton.setEnabled(!isQueueEmpty);
         StartSimulationButton.setEnabled(!isQueueEmpty);
@@ -652,7 +657,7 @@ public class MainView extends javax.swing.JFrame {
     private Process getSelectedProcess() {
         int selectedRow = ProcessTable.getSelectedRow(); 
         if (selectedRow >= 0) {
-            return simulator.getReadyQueue().get(selectedRow);
+            return simulator.getGeneralQueue().get(selectedRow);
         }
         return null; 
     }
@@ -660,8 +665,9 @@ public class MainView extends javax.swing.JFrame {
     //Finalizar la simulacion de forma arbitraria
     private void stopSimulation() {
         //Mostrar estadisticas hasta el momento y resto de logica que debemos implementar
-        isSimulationActive = false;
         PCBMainPanel.removeAll(); //Limpiar PCBs
+        TableProcessorsPanel.removeAll();//Limpiar tabla de procesadores por proceso
+        GlobalClockSimulationLabel.setText("Global Clock Cycle Number: 0");
         //Limpiar listas
         ReadyQueueList.setModel(new DefaultListModel<>());
         BlockedQueueList.setModel(new DefaultListModel<>());
@@ -674,21 +680,25 @@ public class MainView extends javax.swing.JFrame {
     
     //Mostrar o actualizar PCBs
     private void updatePCBSandQueues(){
-        //Limpiar lista de nombres
+        simulator.classifyProcesses();
         simulator.getReadyQueue().getProcessNames().clear();
-        simulator.getBlockedQueue().getProcessNames().clear();
-        simulator.getFinishedQueue().getProcessNames().clear();
+        ReadyQueueList.setModel(new DefaultListModel<>());
+
         //Set modelos de las JList
         ReadyQueueList.setModel(simulator.getReadyQueue().getProcessNames());
         BlockedQueueList.setModel(simulator.getBlockedQueue().getProcessNames());
         FinishedQueueList.setModel(simulator.getFinishedQueue().getProcessNames());
-        PCBMainPanel.removeAll();
-         System.out.println("is queue empty?" + simulator.getReadyQueue().size());
-        ProcessQueue readyQueue = simulator.getReadyQueue();
-        
-        if (readyQueue.size() > 0) {
-            for (int i = 0; i < readyQueue.size(); i++) {
-                Process process = readyQueue.get(i);
+       
+        //Limpiar lista de nombres
+
+        simulator.getBlockedQueue().getProcessNames().clear();
+        simulator.getFinishedQueue().getProcessNames().clear();
+         //Imprimir en interfaz
+        ProcessQueue allProcess = simulator.getGeneralQueue();
+        if (allProcess.size() > 0) {
+            PCBMainPanel.removeAll();
+            for (int i = 0; i < allProcess.size(); i++) {
+                Process process = allProcess.get(i);
                 if (process != null) {
                     ProcessPCB processPanel = new ProcessPCB(process);
                     PCBMainPanel.add(processPanel); 
@@ -699,6 +709,8 @@ public class MainView extends javax.swing.JFrame {
         PCBMainPanel.repaint();
     }
     
+    //Generacion de Tabla de Procesos dinamica
+ 
     
     
     //Txt config
@@ -711,7 +723,7 @@ public class MainView extends javax.swing.JFrame {
         writer.write("#PROCESS");
         writer.newLine();
 
-        simulator.getReadyQueue().iterateProcesses(writer);
+        simulator.getGeneralQueue().iterateProcesses(writer);
 
         writer.newLine();
         writer.write("#CONFIG");
@@ -752,7 +764,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JLabel ExecutionModeLabel;
     private javax.swing.JLabel FinishedQueueLabel;
     private javax.swing.JList<String> FinishedQueueList;
-    private javax.swing.JLabel GlobalClockLabel;
+    private javax.swing.JLabel GlobalClockSimulationLabel;
     private javax.swing.JPanel GraphicsPanel;
     private javax.swing.JRadioButton IOBoundOption;
     private javax.swing.JPanel IOBoundPanel;
@@ -761,7 +773,6 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JScrollPane PCBScrollPane;
     private javax.swing.JComboBox<String> PlanninPolicyComboBox;
     private javax.swing.JLabel PlanningPolicyLabel;
-    private javax.swing.JTable ProccesesPerProcessorsTable;
     private javax.swing.JPanel ProcessDetailsPanel;
     private javax.swing.JTextField ProcessInstructionsTextField;
     private javax.swing.JLabel ProcessNameLabel;
@@ -778,6 +789,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JButton StartSimulationButton;
     private javax.swing.JPanel SystemPerfomanceMetricsPanel;
     private javax.swing.JPanel SystemSpecificationsPanel;
+    private javax.swing.JPanel TableProcessorsPanel;
     private javax.swing.JRadioButton ThreeProcessorsOption;
     private javax.swing.JComboBox<String> TimeUnitComboBox;
     private javax.swing.JRadioButton TwoProcessorsOption;
@@ -786,7 +798,6 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JSeparator jSeparator1;

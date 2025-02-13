@@ -3,8 +3,6 @@ package com.mycompany.proyecto1ssoo;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.DefaultListModel;
 
 /**
@@ -106,7 +104,6 @@ public class ProcessQueue {
             processNamesModel.addElement(process.getName());
         }
     }
-
     return processNamesModel;
     }
 
@@ -116,7 +113,6 @@ public class ProcessQueue {
         writer.newLine();
         return;
     }
-
     int i = front;
     while (true) {
         Process process = processes[i];
