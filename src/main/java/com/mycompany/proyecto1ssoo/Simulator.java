@@ -14,7 +14,7 @@ public class Simulator {
     private ProcessQueue generalQueue;
     private Processor[] processors;
     private int globalCycle;
-    private String schedulingPolicy;
+    private SchedulingPolicy schedulingPolicy;
     private int numProcessors; 
 
     public Simulator(int numProcessors) {
@@ -28,7 +28,6 @@ public class Simulator {
             processors[i] = new Processor(i);
         }
         this.globalCycle = 0;
-        this.schedulingPolicy = "FCFS";  //Arreglar esto a dato dinámico
     }
 
     // Método para cambiar el número de procesadores
@@ -91,15 +90,10 @@ public class Simulator {
                 processor.assignProcess(process); 
             }
         }
-        printProcessTable();
-    }
-
-    public void changeSchedulingPolicy(String newPolicy) {
-        this.schedulingPolicy = newPolicy;
     }
     
     
-       //Llenar tabla de procesos:
+      //Llenar tabla de procesos:
     public DefaultTableModel updateProcessTable() {
         DefaultTableModel model = new DefaultTableModel();
         for (int i = 0; i < numProcessors; i++) {
@@ -116,30 +110,167 @@ public class Simulator {
         return model;
     }
     
-    
-    public void printProcessTable() {
-        System.out.println(" ");
-        System.out.println(" ");
-        System.out.printf("%-10s %-20s %-10s\n", "Procesador", "Proceso Asignado", "Estado");
-        System.out.println("-------------------------------------------");
-        for (Processor processor : processors) {
-            Process currentProcess = processor.getCurrentProcess();
-            String processName = currentProcess != null ? currentProcess.getName() : "Ninguno";
-            String processState = currentProcess != null ? currentProcess.getState().toString() : "Ninguno";
-
-            System.out.printf("%-10d %-20s %-10s\n", processor.getId(), processName, processState);
+    //--------------- IDEA DE FUNCIONES DE PLANIFICACIÓN ----------------------//
+    //SPN (Shortest Process Next)
+    public ProcessQueue reorderBySPN() {
+        int queueSize = readyQueue.size(); 
+        ProcessQueue sortedQueue = new ProcessQueue(queueSize); 
+        Process[] processes = new Process[queueSize];
+        for (int i = 0; i < queueSize; i++) {
+            processes[i] = readyQueue.get(i); 
         }
+        for (int i = 0; i < queueSize - 1; i++) {
+            for (int j = 0; j < queueSize - 1 - i; j++) {
+                if (processes[j].getInstructions() > processes[j + 1].getInstructions()) {
+                    Process tmp = processes[j];
+                    processes[j] = processes[j + 1];
+                    processes[j + 1] = tmp;
+                }
+            }
+        }
+        for (Process p : processes) {
+            sortedQueue.add(p); 
+        }
+        return sortedQueue; 
     }
     
+    
+    
+    //SRT (Shortest Remaining Time)
+    public ProcessQueue reorderBySRT() {
+        int queueSize = readyQueue.size();
+        ProcessQueue sortedQueue = new ProcessQueue(queueSize);
+        Process[] processes = new Process[queueSize];
+        for (int i = 0; i < queueSize; i++) {
+            processes[i] = readyQueue.get(i);
+        }
+        for (int i = 0; i < queueSize - 1; i++) {
+            for (int j = 0; j < queueSize - 1 - i; j++) {
+                if (processes[j].getRemainingInstructions() > processes[j + 1].getRemainingInstructions()) {
+                    Process tmp = processes[j];
+                    processes[j] = processes[j + 1];
+                    processes[j + 1] = tmp;
+                }
+            }
+        }
+        for (Process p : processes) {
+            sortedQueue.add(p);
+        }
 
+        return sortedQueue; 
+    }
+    
+    
+    //HRRN (Highest Response Radio Next)
+    public ProcessQueue reorderByHRRN() {
+        int queueSize = readyQueue.size();
+        ProcessQueue sortedQueue = new ProcessQueue(queueSize);
+        Process[] processes = new Process[queueSize];
+        for (int i = 0; i < queueSize; i++) {
+            processes[i] = readyQueue.get(i);
+        }
+        double[] responseRatios = new double[queueSize];
+        int currentTime = globalCycle;
+        for (int i = 0; i < queueSize; i++) {
+            Process p = processes[i];
+            responseRatios[i] = (currentTime - p.getArrivalOrder() + p.getRemainingInstructions()) / (double) p.getRemainingInstructions();
+        }
+        for (int i = 0; i < queueSize - 1; i++) {
+            for (int j = 0; j < queueSize - 1 - i; j++) {
+                if (responseRatios[j] < responseRatios[j + 1]) {
+                    // Intercambiar procesos
+                    Process tmp = processes[j];
+                    processes[j] = processes[j + 1];
+                    processes[j + 1] = tmp;
+
+                    double tempRatio = responseRatios[j];
+                    responseRatios[j] = responseRatios[j + 1];
+                    responseRatios[j + 1] = tempRatio;
+                }
+            }
+        }
+        for (Process p : processes) {
+            sortedQueue.add(p);
+        }
+        return sortedQueue;
+    }
+    
+    
+    //FCFS (First-Come, First-Served)
+    public ProcessQueue reorderByFCFS() {
+        int queueSize = readyQueue.size();
+        ProcessQueue sortedQueue = new ProcessQueue(queueSize);
+        //sortedQueue.clear(); 
+        Process[] processes = new Process[queueSize];
+        for (int i = 0; i < queueSize; i++) {
+            processes[i] = readyQueue.get(i);
+        }
+        for (int i = 0; i < queueSize - 1; i++) {
+            for (int j = 0; j < queueSize - 1 - i; j++) {
+                if (processes[j].getArrivalOrder() > processes[j + 1].getArrivalOrder()) {
+                    Process tmp = processes[j];
+                    processes[j] = processes[j + 1];
+                    processes[j + 1] = tmp;
+                }
+            }
+        }
+        for (Process p : processes) {
+            sortedQueue.add(p);
+        }
+        return sortedQueue; 
+    }
+    
+    
+    //Round Robin
+    public ProcessQueue reorderByRoundRobin() {
+        int queueSize = readyQueue.size();
+        ProcessQueue sortedQueue = new ProcessQueue(queueSize);
+        //sortedQueue.clear(); 
+        Process[] processes = new Process[queueSize];
+        
+        for (int i = 0; i < queueSize; i++) {
+            processes[i] = readyQueue.get(i);
+        }
+        for (int i = 0; i < queueSize - 1; i++) {
+            for (int j = 0; j < queueSize - 1 - i; j++) {
+                if (processes[j].getArrivalOrder() > processes[j + 1].getArrivalOrder()) {
+                    Process tmp = processes[j];
+                    processes[j] = processes[j + 1];
+                    processes[j + 1] = tmp;
+                }
+            }
+        }
+        for (Process p : processes) {
+            sortedQueue.add(p);
+        }
+        return sortedQueue; 
+    }
+    
+    //----------------------------------------------------------------------//
 
     public int getGlobalCycle() { return globalCycle; }
     public void setGlobalCycle(int newCycle) {
         this.globalCycle = newCycle; 
     }
     
-    public String getSchedulingPolicy() { return schedulingPolicy; }
-    public ProcessQueue getReadyQueue() { return readyQueue; }
+    public void setSchedulingPolicy(SchedulingPolicy newPolicy) {
+        schedulingPolicy = newPolicy; 
+    }
+    
+     public void setReadyQueue(ProcessQueue newQueue) {
+        readyQueue = newQueue; 
+    }
+
+    public ProcessQueue getReadyQueue() {
+        return readyQueue; 
+    }
+
+    public void reorderAndSetReadyQueue() {
+        ProcessQueue sortedQueue = schedulingPolicy.reorder(this); 
+        setReadyQueue(sortedQueue); 
+        readyQueue.printQueue();
+    }
+    
     public ProcessQueue getBlockedQueue() { return blockedQueue; }
     public ProcessQueue getFinishedQueue() { return finishedQueue; }
     public ProcessQueue getGeneralQueue() { return generalQueue; }

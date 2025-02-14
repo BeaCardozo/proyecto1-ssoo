@@ -132,5 +132,18 @@ public class ProcessQueue {
         i = (i + 1) % capacity; 
     }
     }
-}
+    
+    
+    public void printQueue() {
+        if (end == -1) {
+            System.out.println("Queue is empty.");
+            return;
+        }
+        System.out.print("Queue contents: ");
+        for (int i = front; i <= end; i++) {
+            System.out.print(processes[i].getName() + ", ");
+        }
+        System.out.println();
+        }
+    }
 

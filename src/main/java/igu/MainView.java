@@ -7,6 +7,7 @@ import com.mycompany.proyecto1ssoo.Simulator;
 import com.mycompany.proyecto1ssoo.Process;
 import com.mycompany.proyecto1ssoo.ProcessPCB;
 import com.mycompany.proyecto1ssoo.ProcessQueue;
+import com.mycompany.proyecto1ssoo.SchedulingPolicy;
 import java.awt.Color;
 import javax.swing.Timer;
 import javax.swing.table.DefaultTableModel; 
@@ -38,7 +39,10 @@ public class MainView extends javax.swing.JFrame {
         enablePanels(false);
         GlobalClockSimulationLabel.setText("Global Clock Cycle Number: 0");
         ExecutionModeLabel.setText("");
-
+        ModifySpecificationsButton.setVisible(isSimulationActive);
+        for (SchedulingPolicy policy : SchedulingPolicy.values()) {
+            SchedulingPolicyComboBox.addItem(policy.toString());
+        }
     }
 
     /**
@@ -76,10 +80,11 @@ public class MainView extends javax.swing.JFrame {
         CicleDurationLabel = new javax.swing.JLabel();
         ActiveProcessorsTextField = new javax.swing.JLabel();
         CycleDurationTextField = new javax.swing.JTextField();
-        PlanninPolicyComboBox = new javax.swing.JComboBox<>();
+        SchedulingPolicyComboBox = new javax.swing.JComboBox<>();
         TwoProcessorsOption = new javax.swing.JRadioButton();
         ThreeProcessorsOption = new javax.swing.JRadioButton();
         TimeUnitComboBox = new javax.swing.JComboBox<>();
+        ModifySpecificationsButton = new javax.swing.JButton();
         StartSimulationButton = new javax.swing.JButton();
         SimulationPanel = new javax.swing.JPanel();
         SystemPerfomanceMetricsPanel = new javax.swing.JPanel();
@@ -279,10 +284,9 @@ public class MainView extends javax.swing.JFrame {
         });
         SystemSpecificationsPanel.add(CycleDurationTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 50, 160, -1));
 
-        PlanninPolicyComboBox.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
-        PlanninPolicyComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "FCFS - First-Come, First-Served", "Round Robin", "SPN", "HRRN", "SJF - Shortest Job First", " " }));
-        PlanninPolicyComboBox.setBorder(null);
-        SystemSpecificationsPanel.add(PlanninPolicyComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 260, -1));
+        SchedulingPolicyComboBox.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        SchedulingPolicyComboBox.setBorder(null);
+        SystemSpecificationsPanel.add(SchedulingPolicyComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 190, 150, -1));
 
         ActiveProcessorsGroup.add(TwoProcessorsOption);
         TwoProcessorsOption.setSelected(true);
@@ -296,6 +300,19 @@ public class MainView extends javax.swing.JFrame {
         TimeUnitComboBox.setFont(new java.awt.Font("Geneva", 1, 13)); // NOI18N
         TimeUnitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "s", "ms" }));
         SystemSpecificationsPanel.add(TimeUnitComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 50, -1, -1));
+
+        ModifySpecificationsButton.setBackground(new java.awt.Color(153, 153, 255));
+        ModifySpecificationsButton.setFont(new java.awt.Font("Geeza Pro", 1, 13)); // NOI18N
+        ModifySpecificationsButton.setForeground(new java.awt.Color(255, 255, 255));
+        ModifySpecificationsButton.setText("Save");
+        ModifySpecificationsButton.setBorderPainted(false);
+        ModifySpecificationsButton.setOpaque(true);
+        ModifySpecificationsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ModifySpecificationsButtonActionPerformed(evt);
+            }
+        });
+        SystemSpecificationsPanel.add(ModifySpecificationsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 190, 90, 30));
 
         ConfigPanel.add(SystemSpecificationsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 570, 280, 240));
 
@@ -448,40 +465,42 @@ public class MainView extends javax.swing.JFrame {
     //Boton de Iniciar Simulacion o Finalizar la Simulación
     private void StartSimulationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartSimulationButtonActionPerformed
         if (CycleDurationTextField.getText().trim().isEmpty()) {
-        JOptionPane.showMessageDialog(null, "Please enter a Cycle Duration.", "Warning", JOptionPane.WARNING_MESSAGE);
-        return;
-    }
+            JOptionPane.showMessageDialog(null, "Please enter a Cycle Duration.", "Warning", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (isSimulationActive) { 
+            // Detener la simulación
+            stopSimulation(); 
+            isSimulationActive = false;
+            ModifySpecificationsButton.setVisible(isSimulationActive);
+            StartSimulationButton.setText("Start Simulation");
+            StartSimulationButton.setBackground(new Color(241, 241, 169));
+            StartSimulationButton.setForeground(Color.BLACK);
+            return; 
+        } else { 
+            saveToFile(); 
+            updatePCBSandQueues(); 
+            disablePanels(false); 
+            enablePanels(true);
+            // Cambiar el botón a "Stop Simulation"
+            StartSimulationButton.setText("Stop Simulation");
+            StartSimulationButton.setBackground(Color.RED);
+            StartSimulationButton.setForeground(Color.WHITE);
+            int cycleDuration = Integer.parseInt(CycleDurationTextField.getText());
+            int numProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
+            simulator.setNumProcessors(numProcessors); 
+            String selectedItem = SchedulingPolicyComboBox.getSelectedItem().toString();
+            if (selectedItem != null) {
+                 SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
+                simulator.setSchedulingPolicy(policy);
+                simulator.reorderAndSetReadyQueue(); // Imprime la política seleccionada
+                System.out.println("Selected Policy: " + policy);
+            } else {
+                System.out.println("No se ha seleccionado ninguna política.");
+            }
 
-    if (isSimulationActive) { 
-        // Detener la simulación
-        stopSimulation(); 
-        isSimulationActive = false;
-
-        StartSimulationButton.setText("Start Simulation");
-        StartSimulationButton.setBackground(new Color(241, 241, 169));
-        StartSimulationButton.setForeground(Color.BLACK);
-        return; // Terminar el método si está deteniendo la simulación
-    } else { 
-        saveToFile(); 
-        updatePCBSandQueues(); 
-        disablePanels(false); 
-        enablePanels(true);
-        
-        
-        // Cambiar el botón a "Stop Simulation"
-        StartSimulationButton.setText("Stop Simulation");
-        StartSimulationButton.setBackground(Color.RED);
-        StartSimulationButton.setForeground(Color.WHITE);
-        
-        int cycleDuration = Integer.parseInt(CycleDurationTextField.getText());
-        int numProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
-        
-        
-        
-        simulator.setNumProcessors(numProcessors); // Asignar número de procesadores
-
-        // Crear y empezar el temporizador
-        timer = new Timer(cycleDuration * 1000, new ActionListener() {
+            // Crear y empezar el temporizador
+            timer = new Timer(cycleDuration * 1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!isSimulationActive) { 
@@ -492,17 +511,16 @@ public class MainView extends javax.swing.JFrame {
                 simulator.executeCycle(); 
                 GlobalClockSimulationLabel.setText("Global Clock Cycle Number: " + simulator.getGlobalCycle());
                 updatePCBSandQueues(); 
-                
                 TableProcessorsPanel.removeAll();
                 TableProcessors table = new TableProcessors(simulator.updateProcessTable());
                 TableProcessorsPanel.add(table);
+                }
+            });
 
-            }
-        });
-
-        timer.start(); // Iniciar el temporizador
-        isSimulationActive = true; 
-    }
+            timer.start(); // Iniciar el temporizador
+            isSimulationActive = true; 
+            ModifySpecificationsButton.setVisible(isSimulationActive);
+        }
     }//GEN-LAST:event_StartSimulationButtonActionPerformed
 
     private void IOBoundOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IOBoundOptionActionPerformed
@@ -537,7 +555,7 @@ public class MainView extends javax.swing.JFrame {
         System.out.println("Number of instructions: " + numberOfInstructions);
 
         // Crear el proceso
-        Process process = new Process(simulator.getGlobalCycle(), name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle);
+        Process process = new Process(name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle); //id se asigna automatico
     
         // Agregar el proceso al simulador
         simulator.addProcess(process);
@@ -586,6 +604,20 @@ public class MainView extends javax.swing.JFrame {
             evt.consume(); 
         }
     }//GEN-LAST:event_ProcessNameTextFieldKeyTyped
+
+    private void ModifySpecificationsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModifySpecificationsButtonActionPerformed
+        //Cambiar los argumentos de System Specifications
+        simulator.classifyProcesses();
+        String selectedItem = SchedulingPolicyComboBox.getSelectedItem().toString();
+            if (selectedItem != null) {
+                SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
+                simulator.setSchedulingPolicy(policy);
+                simulator.reorderAndSetReadyQueue(); 
+                System.out.println("Selected Policy: " + policy);
+            } else {
+                System.out.println("No se ha seleccionado ninguna política.");
+            }
+    }//GEN-LAST:event_ModifySpecificationsButtonActionPerformed
     
     
     //FUNCIONES
@@ -708,11 +740,7 @@ public class MainView extends javax.swing.JFrame {
         PCBMainPanel.revalidate(); 
         PCBMainPanel.repaint();
     }
-    
-    //Generacion de Tabla de Procesos dinamica
- 
-    
-    
+
     //Txt config
     private void saveToFile() {
     String filename = System.getProperty("user.dir") + "/simulation_results.txt";
@@ -734,7 +762,7 @@ public class MainView extends javax.swing.JFrame {
         writer.write("Number of Active Processors: " + 
                      (TwoProcessorsOption.isSelected() ? "2" : "3"));
         writer.newLine();
-        writer.write("Planning Policy: " + PlanninPolicyComboBox.getSelectedItem());
+        writer.write("Planning Policy: " + SchedulingPolicyComboBox.getSelectedItem());
         writer.newLine();
 
         JOptionPane.showMessageDialog(null, "Your simulation data has been saved in " + filename);
@@ -769,9 +797,9 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JRadioButton IOBoundOption;
     private javax.swing.JPanel IOBoundPanel;
     private javax.swing.JLabel ModeLabel;
+    private javax.swing.JButton ModifySpecificationsButton;
     private javax.swing.JPanel PCBMainPanel;
     private javax.swing.JScrollPane PCBScrollPane;
-    private javax.swing.JComboBox<String> PlanninPolicyComboBox;
     private javax.swing.JLabel PlanningPolicyLabel;
     private javax.swing.JPanel ProcessDetailsPanel;
     private javax.swing.JTextField ProcessInstructionsTextField;
@@ -784,6 +812,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JPanel QueuePanel;
     private javax.swing.JLabel ReadyQueueLabel;
     private javax.swing.JList ReadyQueueList;
+    private javax.swing.JComboBox<String> SchedulingPolicyComboBox;
     private javax.swing.JPanel SimulationDetailsPanel;
     private javax.swing.JPanel SimulationPanel;
     private javax.swing.JButton StartSimulationButton;

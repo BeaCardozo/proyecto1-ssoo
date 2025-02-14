@@ -12,9 +12,11 @@ public class Process{
     private int satisfactionCycles;
     private int programCounter;
     private int mar;
+    private static int orderCounter = 0; 
+    private int arrivalOrder; 
     private ProcessState state;
 
-    public Process(int id, String name, int instructions, boolean isCpuBound, int exceptionCycles, int satisfactionCycles) {
+    public Process(String name, int instructions, boolean isCpuBound, int exceptionCycles, int satisfactionCycles) {
         this.id =  generateRandomId();
         this.name = name;
         this.instructions = instructions;
@@ -24,6 +26,7 @@ public class Process{
         this.programCounter = 1;
         this.mar = 0;
         this.state = ProcessState.READY;
+         this.arrivalOrder = ++orderCounter;
     }
     
     
@@ -42,8 +45,8 @@ public class Process{
     public int getSatisfactionCycles() { return satisfactionCycles; }
     public int getProgramCounter() { return programCounter; }
     public int getMAR() { return mar; }
+    public int getArrivalOrder() { return arrivalOrder; }
     public ProcessState getState() { return state; }
-
     public void setState(ProcessState state) { this.state = state; }
     public void incrementProgramCounter() { this.programCounter++; }
 
