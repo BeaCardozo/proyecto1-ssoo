@@ -115,10 +115,10 @@ public class MainView extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(1200, 800));
-        setPreferredSize(new java.awt.Dimension(1200, 800));
+        setMinimumSize(new java.awt.Dimension(1300, 725));
+        setPreferredSize(new java.awt.Dimension(1300, 725));
         setResizable(false);
-        setSize(new java.awt.Dimension(1200, 800));
+        setSize(new java.awt.Dimension(1300, 725));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         ConfigPanel.setBackground(new java.awt.Color(255, 255, 255));
@@ -130,7 +130,7 @@ public class MainView extends javax.swing.JFrame {
 
         ProcessTypeLabel.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         ProcessTypeLabel.setText("Process Type:");
-        ProcessDetailsPanel.add(ProcessTypeLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, 230, -1));
+        ProcessDetailsPanel.add(ProcessTypeLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 70, 230, -1));
 
         ProcessTypeGroup.add(IOBoundOption);
         IOBoundOption.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
@@ -141,7 +141,7 @@ public class MainView extends javax.swing.JFrame {
                 IOBoundOptionActionPerformed(evt);
             }
         });
-        ProcessDetailsPanel.add(IOBoundOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, -1, -1));
+        ProcessDetailsPanel.add(IOBoundOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 90, -1, -1));
 
         ProcessTypeGroup.add(CPUBoundOption);
         CPUBoundOption.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
@@ -151,7 +151,7 @@ public class MainView extends javax.swing.JFrame {
                 CPUBoundOptionActionPerformed(evt);
             }
         });
-        ProcessDetailsPanel.add(CPUBoundOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 90, -1, -1));
+        ProcessDetailsPanel.add(CPUBoundOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 90, -1, -1));
 
         ProcessTable.setAutoCreateRowSorter(true);
         ProcessTable.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
@@ -176,7 +176,7 @@ public class MainView extends javax.swing.JFrame {
         ProcessTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(ProcessTable);
 
-        ProcessDetailsPanel.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 320, 260, 80));
+        ProcessDetailsPanel.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 320, 270, 80));
 
         ClearProcessTableButton.setBackground(new java.awt.Color(169, 217, 241));
         ClearProcessTableButton.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
@@ -188,7 +188,7 @@ public class MainView extends javax.swing.JFrame {
                 ClearProcessTableButtonActionPerformed(evt);
             }
         });
-        ProcessDetailsPanel.add(ClearProcessTableButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 410, 110, 30));
+        ProcessDetailsPanel.add(ClearProcessTableButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 410, 110, 30));
 
         AddProcessButton.setBackground(new java.awt.Color(169, 217, 241));
         AddProcessButton.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
@@ -200,7 +200,7 @@ public class MainView extends javax.swing.JFrame {
                 AddProcessButtonActionPerformed(evt);
             }
         });
-        ProcessDetailsPanel.add(AddProcessButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 280, 200, 30));
+        ProcessDetailsPanel.add(AddProcessButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 280, 200, 30));
 
         DeleteProcessButton.setBackground(new java.awt.Color(169, 217, 241));
         DeleteProcessButton.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
@@ -216,28 +216,28 @@ public class MainView extends javax.swing.JFrame {
 
         ProcessNameLabel.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         ProcessNameLabel.setText("Process Name:");
-        ProcessDetailsPanel.add(ProcessNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 230, -1));
+        ProcessDetailsPanel.add(ProcessNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 20, 230, -1));
 
         IOBoundPanel.setBackground(new java.awt.Color(255, 255, 255));
         IOBoundPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         CyclesSatisfyExcepLabel.setFont(new java.awt.Font("Geneva", 0, 11)); // NOI18N
         CyclesSatisfyExcepLabel.setText("Cycles to satisfy an exception:");
-        IOBoundPanel.add(CyclesSatisfyExcepLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 60, -1, -1));
+        IOBoundPanel.add(CyclesSatisfyExcepLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 60, -1, -1));
 
         CyclesGenerateExcepLabel.setFont(new java.awt.Font("Geneva", 0, 11)); // NOI18N
         CyclesGenerateExcepLabel.setText("Cycles to generate an exception:");
-        IOBoundPanel.add(CyclesGenerateExcepLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 10, -1, -1));
+        IOBoundPanel.add(CyclesGenerateExcepLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 10, -1, -1));
 
         CyclesSatisfyExcepSpinner.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         CyclesSatisfyExcepSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 50, 1));
-        IOBoundPanel.add(CyclesSatisfyExcepSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 80, 70, 20));
+        IOBoundPanel.add(CyclesSatisfyExcepSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 80, 70, 20));
 
         CyclesGenerateExcepSpinner.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         CyclesGenerateExcepSpinner.setModel(new javax.swing.SpinnerNumberModel(1, 1, 50, 1));
-        IOBoundPanel.add(CyclesGenerateExcepSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 30, 70, 20));
+        IOBoundPanel.add(CyclesGenerateExcepSpinner, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 30, 70, 20));
 
-        ProcessDetailsPanel.add(IOBoundPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 260, 110));
+        ProcessDetailsPanel.add(IOBoundPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 290, 110));
 
         ProcessNameTextField.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         ProcessNameTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -246,11 +246,11 @@ public class MainView extends javax.swing.JFrame {
                 ProcessNameTextFieldKeyTyped(evt);
             }
         });
-        ProcessDetailsPanel.add(ProcessNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 250, -1));
+        ProcessDetailsPanel.add(ProcessNameTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 250, -1));
 
         jLabel3.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         jLabel3.setText("Number of instructions:");
-        ProcessDetailsPanel.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 240, -1));
+        ProcessDetailsPanel.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, 240, -1));
 
         ProcessInstructionsTextField.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         ProcessInstructionsTextField.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -259,9 +259,9 @@ public class MainView extends javax.swing.JFrame {
                 ProcessInstructionsTextFieldKeyTyped(evt);
             }
         });
-        ProcessDetailsPanel.add(ProcessInstructionsTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 250, -1));
+        ProcessDetailsPanel.add(ProcessInstructionsTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 140, 250, -1));
 
-        ConfigPanel.add(ProcessDetailsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 280, 460));
+        ConfigPanel.add(ProcessDetailsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 310, 460));
 
         SystemSpecificationsPanel.setBackground(new java.awt.Color(255, 255, 255));
         SystemSpecificationsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "System Specifications", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 14))); // NOI18N
@@ -269,7 +269,7 @@ public class MainView extends javax.swing.JFrame {
 
         PlanningPolicyLabel.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         PlanningPolicyLabel.setText("Planning Policy:");
-        SystemSpecificationsPanel.add(PlanningPolicyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 210, -1));
+        SystemSpecificationsPanel.add(PlanningPolicyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, 210, -1));
 
         CicleDurationLabel.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         CicleDurationLabel.setText("Cycle Duration:");
@@ -286,26 +286,26 @@ public class MainView extends javax.swing.JFrame {
                 CycleDurationTextFieldKeyTyped(evt);
             }
         });
-        SystemSpecificationsPanel.add(CycleDurationTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 160, -1));
+        SystemSpecificationsPanel.add(CycleDurationTextField, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, 200, -1));
 
         SchedulingPolicyComboBox.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         SchedulingPolicyComboBox.setBorder(null);
-        SystemSpecificationsPanel.add(SchedulingPolicyComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 150, -1));
+        SystemSpecificationsPanel.add(SchedulingPolicyComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, 150, -1));
 
         ActiveProcessorsGroup.add(TwoProcessorsOption);
         TwoProcessorsOption.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         TwoProcessorsOption.setSelected(true);
         TwoProcessorsOption.setText("2");
-        SystemSpecificationsPanel.add(TwoProcessorsOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 90, -1, -1));
+        SystemSpecificationsPanel.add(TwoProcessorsOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 70, -1, -1));
 
         ActiveProcessorsGroup.add(ThreeProcessorsOption);
         ThreeProcessorsOption.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         ThreeProcessorsOption.setText("3");
-        SystemSpecificationsPanel.add(ThreeProcessorsOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 90, -1, -1));
+        SystemSpecificationsPanel.add(ThreeProcessorsOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 70, -1, -1));
 
         TimeUnitComboBox.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         TimeUnitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "s", "ms" }));
-        SystemSpecificationsPanel.add(TimeUnitComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 40, -1, -1));
+        SystemSpecificationsPanel.add(TimeUnitComboBox, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, -1, -1));
 
         ModifySpecificationsButton.setBackground(new java.awt.Color(153, 153, 255));
         ModifySpecificationsButton.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
@@ -318,9 +318,9 @@ public class MainView extends javax.swing.JFrame {
                 ModifySpecificationsButtonActionPerformed(evt);
             }
         });
-        SystemSpecificationsPanel.add(ModifySpecificationsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 140, 90, 30));
+        SystemSpecificationsPanel.add(ModifySpecificationsButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 110, 90, 30));
 
-        ConfigPanel.add(SystemSpecificationsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 490, 280, 190));
+        ConfigPanel.add(SystemSpecificationsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 470, 310, 160));
 
         StartSimulationButton.setBackground(new java.awt.Color(181, 241, 169));
         StartSimulationButton.setFont(new java.awt.Font("Geneva", 1, 14)); // NOI18N
@@ -332,9 +332,9 @@ public class MainView extends javax.swing.JFrame {
                 StartSimulationButtonActionPerformed(evt);
             }
         });
-        ConfigPanel.add(StartSimulationButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 690, 280, 50));
+        ConfigPanel.add(StartSimulationButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 630, 310, 40));
 
-        getContentPane().add(ConfigPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 300, 800));
+        getContentPane().add(ConfigPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 340, 700));
 
         SimulationPanel.setBackground(new java.awt.Color(255, 255, 255));
         SimulationPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -346,9 +346,9 @@ public class MainView extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(153, 153, 153));
         jLabel1.setText("No information available yet.");
-        SystemPerfomanceMetricsPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 90, -1, -1));
+        SystemPerfomanceMetricsPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 70, -1, -1));
 
-        SimulationPanel.add(SystemPerfomanceMetricsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 530, 400, 210));
+        SimulationPanel.add(SystemPerfomanceMetricsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, 410, 170));
 
         GraphicsPanel.setBackground(new java.awt.Color(255, 255, 255));
         GraphicsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Graphics", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 14))); // NOI18N
@@ -357,9 +357,9 @@ public class MainView extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(153, 153, 153));
         jLabel2.setText("No information available yet.");
-        GraphicsPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 80, -1, -1));
+        GraphicsPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, -1, -1));
 
-        SimulationPanel.add(GraphicsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 540, 450, 200));
+        SimulationPanel.add(GraphicsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 500, 500, 170));
 
         SimulationDetailsPanel.setBackground(new java.awt.Color(255, 255, 255));
         SimulationDetailsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 14))); // NOI18N
@@ -389,7 +389,7 @@ public class MainView extends javax.swing.JFrame {
         TableProcessorsPanel.setBackground(new java.awt.Color(255, 255, 255));
         DetailsPanel.add(TableProcessorsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 110, 340, 80));
 
-        SimulationDetailsPanel.add(DetailsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 380, 210));
+        SimulationDetailsPanel.add(DetailsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 40, 410, 210));
 
         QueuePanel.setBackground(new java.awt.Color(255, 255, 255));
         QueuePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Queue", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 13))); // NOI18N
@@ -397,15 +397,15 @@ public class MainView extends javax.swing.JFrame {
 
         ReadyQueueLabel.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         ReadyQueueLabel.setText("Ready");
-        QueuePanel.add(ReadyQueueLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 30, 90, -1));
+        QueuePanel.add(ReadyQueueLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 30, 90, -1));
 
         BlockedQueueLabel.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         BlockedQueueLabel.setText("Blocked");
-        QueuePanel.add(BlockedQueueLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 30, 90, -1));
+        QueuePanel.add(BlockedQueueLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 30, 90, -1));
 
         FinishedQueueLabel.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         FinishedQueueLabel.setText("Finished");
-        QueuePanel.add(FinishedQueueLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 30, 90, -1));
+        QueuePanel.add(FinishedQueueLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 30, 90, -1));
 
         ReadyQueueList.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         ReadyQueueList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
@@ -415,21 +415,21 @@ public class MainView extends javax.swing.JFrame {
         ReadyQueueList.setVerifyInputWhenFocusTarget(false);
         jScrollPane5.setViewportView(ReadyQueueList);
 
-        QueuePanel.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 50, 90, 120));
+        QueuePanel.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 50, 90, 120));
 
         FinishedQueueList.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         FinishedQueueList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         FinishedQueueList.setSelectionBackground(null);
         jScrollPane6.setViewportView(FinishedQueueList);
 
-        QueuePanel.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 50, 90, 120));
+        QueuePanel.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 50, 90, 120));
 
         BlockedQueueList.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
         jScrollPane2.setViewportView(BlockedQueueList);
 
-        QueuePanel.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 50, 90, 120));
+        QueuePanel.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 50, 90, 120));
 
-        SimulationDetailsPanel.add(QueuePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 40, 440, 210));
+        SimulationDetailsPanel.add(QueuePanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 40, 470, 210));
 
         PCBScrollPane.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Process Control Blocks", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 13))); // NOI18N
 
@@ -439,11 +439,11 @@ public class MainView extends javax.swing.JFrame {
 
         PCBScrollPane.setViewportView(PCBMainPanel);
 
-        SimulationDetailsPanel.add(PCBScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 260, 850, 220));
+        SimulationDetailsPanel.add(PCBScrollPane, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 260, 900, 220));
 
-        SimulationPanel.add(SimulationDetailsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 890, 510));
+        SimulationPanel.add(SimulationDetailsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, 940, 490));
 
-        getContentPane().add(SimulationPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 0, 900, 800));
+        getContentPane().add(SimulationPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 0, 970, 700));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
