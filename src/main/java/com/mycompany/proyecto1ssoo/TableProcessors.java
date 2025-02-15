@@ -35,10 +35,10 @@ public class TableProcessors extends javax.swing.JPanel {
         setBackground(new java.awt.Color(255, 255, 255));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        ProccesesPerProcessorsTable.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        ProccesesPerProcessorsTable.setFont(new java.awt.Font("Geneva", 0, 11)); // NOI18N
         jScrollPane3.setViewportView(ProccesesPerProcessorsTable);
 
-        add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 380, 70));
+        add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 310, 70));
     }// </editor-fold>//GEN-END:initComponents
 
 

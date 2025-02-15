@@ -55,51 +55,53 @@ public class ProcessPCB extends javax.swing.JPanel {
         ProcessPCBSquare.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         ProcessNameLabel.setFont(new java.awt.Font("Geeza Pro", 3, 14)); // NOI18N
+        ProcessNameLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         ProcessNameLabel.setText("PROCESO");
-        ProcessPCBSquare.add(ProcessNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 160, -1));
+        ProcessNameLabel.setVerticalAlignment(javax.swing.SwingConstants.BOTTOM);
+        ProcessPCBSquare.add(ProcessNameLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 180, 30));
 
-        jLabel1.setFont(new java.awt.Font("Geneva", 3, 13)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         jLabel1.setText("ID:");
         ProcessPCBSquare.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 40, -1, -1));
 
-        ProcessIDLabel.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        ProcessIDLabel.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         ProcessIDLabel.setText("id");
-        ProcessPCBSquare.add(ProcessIDLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, -1, -1));
+        ProcessPCBSquare.add(ProcessIDLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, 110, -1));
 
-        jLabel2.setFont(new java.awt.Font("Geneva", 3, 13)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         jLabel2.setText("STATUS: ");
-        ProcessPCBSquare.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 70, -1, -1));
+        ProcessPCBSquare.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 60, -1, -1));
 
-        ProcessStatusLabel.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        ProcessStatusLabel.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         ProcessStatusLabel.setText("status");
-        ProcessPCBSquare.add(ProcessStatusLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 70, -1, -1));
+        ProcessPCBSquare.add(ProcessStatusLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 60, 80, -1));
 
-        jLabel3.setFont(new java.awt.Font("Geneva", 3, 13)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         jLabel3.setText("PC:");
-        ProcessPCBSquare.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 130, -1, -1));
+        ProcessPCBSquare.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, -1, -1));
 
-        jLabel4.setFont(new java.awt.Font("Geneva", 3, 13)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         jLabel4.setText("TYPE:");
-        ProcessPCBSquare.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 100, -1, -1));
+        ProcessPCBSquare.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, -1, -1));
 
-        jLabel5.setFont(new java.awt.Font("Geneva", 3, 13)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         jLabel5.setText("MAR:");
-        ProcessPCBSquare.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, -1, -1));
+        ProcessPCBSquare.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 120, -1, -1));
         ProcessPCBSquare.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 180, 10));
 
-        ProcessTypeLabel.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        ProcessTypeLabel.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         ProcessTypeLabel.setText("type");
-        ProcessPCBSquare.add(ProcessTypeLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 100, -1, -1));
+        ProcessPCBSquare.add(ProcessTypeLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 80, 100, -1));
 
-        ProcessPCLabel.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        ProcessPCLabel.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         ProcessPCLabel.setText("pc");
-        ProcessPCBSquare.add(ProcessPCLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 130, -1, -1));
+        ProcessPCBSquare.add(ProcessPCLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 110, -1));
 
-        ProcessMARLabel.setFont(new java.awt.Font("Geneva", 0, 13)); // NOI18N
+        ProcessMARLabel.setFont(new java.awt.Font("Geneva", 3, 12)); // NOI18N
         ProcessMARLabel.setText("mar");
-        ProcessPCBSquare.add(ProcessMARLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 160, -1, -1));
+        ProcessPCBSquare.add(ProcessMARLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 120, 110, -1));
 
-        add(ProcessPCBSquare, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 10, 180, 190));
+        add(ProcessPCBSquare, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 180, 150));
     }// </editor-fold>//GEN-END:initComponents
 
 

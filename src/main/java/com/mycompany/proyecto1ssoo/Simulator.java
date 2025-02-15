@@ -103,7 +103,7 @@ public class Simulator {
         for (int i = 0; i < numProcessors; i++) {
             Processor processor = processors[i]; // 
             Process currentProcess = processor.getCurrentProcess();
-            String processName = currentProcess != null ? currentProcess.getName() : "Ninguno";
+            String processName = currentProcess != null ? currentProcess.getName() : "None";
             rowData[i] = processName;
         }
         model.addRow(rowData);
