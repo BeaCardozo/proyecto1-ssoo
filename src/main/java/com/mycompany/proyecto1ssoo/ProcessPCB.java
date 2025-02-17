@@ -17,7 +17,7 @@ public class ProcessPCB extends javax.swing.JPanel {
         initComponents(); 
         ProcessIDLabel.setText(String.valueOf(process.getId()));
         ProcessNameLabel.setText(process.getName());
-        ProcessStatusLabel.setText(process.getState().name());
+        ProcessStatusLabel.setText(process.getState());
         ProcessTypeLabel.setText(process.isCpuBound() ? "CPU BOUND" : "I/O BOUND");
         ProcessPCLabel.setText(String.valueOf(process.getProgramCounter()));
         ProcessMARLabel.setText(String.valueOf(process.getMAR()));

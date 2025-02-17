@@ -34,7 +34,7 @@ public class MainView extends javax.swing.JFrame {
     
     public MainView() {
         initComponents();
-        simulator = new Simulator(3); 
+        simulator = new Simulator(3,this);
         updateButtonStates(); 
         setTitle("Process Simulator");
         disableJPanel(IOBoundPanel, IOBoundOption.isSelected());
@@ -46,7 +46,6 @@ public class MainView extends javax.swing.JFrame {
             SchedulingPolicyComboBox.addItem(policy.toString());
         }
     }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -500,7 +499,7 @@ public class MainView extends javax.swing.JFrame {
                  SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
                 simulator.setSchedulingPolicy(policy);
                 simulator.reorderAndSetReadyQueue(); // Imprime la política seleccionada
-                System.out.println("Selected Policy: " + policy);
+                //System.out.println("Selected Policy: " + policy);
             } else {
                 System.out.println("No se ha seleccionado ninguna política.");
             }
@@ -526,9 +525,10 @@ public class MainView extends javax.swing.JFrame {
             timer.start(); // Iniciar el temporizador
             isSimulationActive = true; 
             ModifySpecificationsButton.setVisible(isSimulationActive);
+            updatePCBSandQueues();
         }
     }//GEN-LAST:event_StartSimulationButtonActionPerformed
-
+    
     private void IOBoundOptionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_IOBoundOptionActionPerformed
         disableJPanel(IOBoundPanel,true);
     }//GEN-LAST:event_IOBoundOptionActionPerformed
@@ -552,18 +552,13 @@ public class MainView extends javax.swing.JFrame {
         int exceptionCycle = (int) CyclesGenerateExcepSpinner.getValue();
         int satisfactionCycle = (int) CyclesSatisfyExcepSpinner.getValue();
         int numberOfInstructions = Integer.parseInt(ProcessInstructionsTextField.getText().trim());
-
-        System.out.println("Creating process:");
-        System.out.println("Name: " + name);
-        System.out.println("Type: " + (isCpuBound ? "CPU Bound" : "I/O Bound"));
-        System.out.println("Cycles to generate an exception: " + exceptionCycle);
-        System.out.println("Cycles to satisfy an exception: " + satisfactionCycle);
-        System.out.println("Number of instructions: " + numberOfInstructions);
-
+        
         // Crear el proceso
-        Process process = new Process(name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle); //id se asigna automatico
+        Process process = new Process(name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle, simulator); //id se asigna automatico
     
         // Agregar el proceso al simulador
+        //ProcessQueue readyQueue = new ProcessQueue(3);
+        //esto genera que se active el botron start sikmul
         simulator.addProcess(process);
 
         DefaultTableModel modelo = (DefaultTableModel) ProcessTable.getModel();
@@ -717,35 +712,51 @@ public class MainView extends javax.swing.JFrame {
     }
     
     //Mostrar o actualizar PCBs
-    private void updatePCBSandQueues(){
-        simulator.classifyProcesses();
-        simulator.getReadyQueue().getProcessNames().clear();
-        ReadyQueueList.setModel(new DefaultListModel<>());
+    public void updatePCBSandQueues() {
+    // Clasificar los procesos en las colas correspondientes
+    simulator.classifyProcesses();
 
-        //Set modelos de las JList
-        ReadyQueueList.setModel(simulator.getReadyQueue().getProcessNames());
-        BlockedQueueList.setModel(simulator.getBlockedQueue().getProcessNames());
-        FinishedQueueList.setModel(simulator.getFinishedQueue().getProcessNames());
-       
-        //Limpiar lista de nombres
+    // Crear nuevos modelos para las listas de la interfaz
+    DefaultListModel<String> readyListModel = new DefaultListModel<>();
+    DefaultListModel<String> blockedListModel = new DefaultListModel<>();
+    DefaultListModel<String> finishedListModel = new DefaultListModel<>();
 
-        simulator.getBlockedQueue().getProcessNames().clear();
-        simulator.getFinishedQueue().getProcessNames().clear();
-         //Imprimir en interfaz
-        ProcessQueue allProcess = simulator.getGeneralQueue();
-        if (allProcess.size() > 0) {
-            PCBMainPanel.removeAll();
-            for (int i = 0; i < allProcess.size(); i++) {
-                Process process = allProcess.get(i);
-                if (process != null) {
-                    ProcessPCB processPanel = new ProcessPCB(process);
-                    PCBMainPanel.add(processPanel); 
-                }
+    // Obtener los nombres de los procesos en cada cola y agregarlos a los modelos
+    for (int i = 0; i < simulator.getReadyQueue().size(); i++) {
+        Process process = simulator.getReadyQueue().get(i);
+        readyListModel.addElement(process.getName());
+    }
+
+    for (int i = 0; i < simulator.getBlockedQueue().size(); i++) {
+        Process process = simulator.getBlockedQueue().get(i);
+        blockedListModel.addElement(process.getName());
+    }
+
+    for (int i = 0; i < simulator.getFinishedQueue().size(); i++) {
+        Process process = simulator.getFinishedQueue().get(i);
+        finishedListModel.addElement(process.getName());
+    }
+
+    // Asignar los nuevos modelos a las listas de la interfaz
+    ReadyQueueList.setModel(readyListModel);
+    BlockedQueueList.setModel(blockedListModel);
+    FinishedQueueList.setModel(finishedListModel);
+
+    // Actualizar los PCBs en la interfaz gráfica
+    PCBMainPanel.removeAll();
+    ProcessQueue allProcess = simulator.getGeneralQueue();
+    if (allProcess.size() > 0) {
+        for (int i = 0; i < allProcess.size(); i++) {
+            Process process = allProcess.get(i);
+            if (process != null) {
+                ProcessPCB processPanel = new ProcessPCB(process);
+                PCBMainPanel.add(processPanel);
             }
         }
-        PCBMainPanel.revalidate(); 
-        PCBMainPanel.repaint();
     }
+    PCBMainPanel.revalidate();
+    PCBMainPanel.repaint();
+}
 
     //Txt config
     private void saveToFile() {

@@ -2,13 +2,13 @@ package com.mycompany.proyecto1ssoo;
 
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
-
+import igu.MainView;
 /**
  *
  * @author Rodrigo
  */
 public class Simulator {
-    private ProcessQueue readyQueue;
+    public ProcessQueue readyQueue;
     private ProcessQueue blockedQueue;
     private ProcessQueue finishedQueue;
     private ProcessQueue generalQueue;
@@ -16,8 +16,10 @@ public class Simulator {
     private int globalCycle;
     private SchedulingPolicy schedulingPolicy;
     private int numProcessors; 
+    private MainView mainView;
+    private static Simulator instance;
 
-    public Simulator(int numProcessors) {
+    public Simulator(int numProcessors, MainView mainView) {
         this.numProcessors = numProcessors;  
         this.readyQueue = new ProcessQueue(100);
         this.blockedQueue = new ProcessQueue(100);
@@ -28,8 +30,17 @@ public class Simulator {
             processors[i] = new Processor(i);
         }
         this.globalCycle = 0;
+        this.mainView = mainView;
+        this.instance = instance;
     }
-
+    
+    public static Simulator getInstance(int numProcessors, MainView mainView) {
+        if (instance == null) {
+            instance = new Simulator(numProcessors, mainView); // Pasar mainView al constructor
+        }
+        return instance;
+    }
+    
     // Método para cambiar el número de procesadores
     public void setNumProcessors(int numProcessors) {
         this.numProcessors = numProcessors; 
@@ -42,46 +53,98 @@ public class Simulator {
     public void addProcess(Process process) {
         generalQueue.add(process);
     }
+ 
     
-    public void classifyProcesses() {
-        int size = generalQueue.size();
+   public void classifyProcesses() {
+    // No limpiar las colas aquí, solo reclasificar los procesos
+    for (int i = 0; i < generalQueue.size(); i++) {
+        Process process = generalQueue.get(i);
 
-        for (int i = 0; i < size; i++) {
-            Process process = generalQueue.get(i); 
-
-            switch (process.getState()) {
-                case READY:
-                    readyQueue.add(process); // Añadir a la cola de listos
-                    break;
-                case BLOCKED:
-                    blockedQueue.add(process); // Añadir a la cola bloqueada
-                    break;
-                case FINISHED:
-                    finishedQueue.add(process); // Añadir a la cola finalizada
-                    break;
-                case RUNNING:
-                    System.out.println("proceso en ejecución");
-                    break;
-                default:
-                    System.out.println("Estado desconocido: " + process.getState());
+        switch (process.getState()) {
+            case"READY":
+                if (!readyQueue.contains(process)) {
+                    readyQueue.add(process); // Agregar a la cola de listos si no está ya
+                    System.out.println("Proceso "+process.getName()+" agregado a la cola de listos");
+                }
                 break;
-            }
+            case "BLOCKED":
+                if (!blockedQueue.contains(process)) {
+                    blockedQueue.add(process); // Agregar a la cola de bloqueados si no está ya
+                    System.out.println("Proceso "+process.getName()+" agregado a la cola de bloqueados");
+                }
+                break;
+            case "FINISHED":
+                if (!finishedQueue.contains(process)) {
+                    finishedQueue.add(process); // Agregar a la cola de finalizados si no está ya
+                    System.out.println("Proceso "+process.getName()+" agregado a la cola de terminados");
+                }
+                break;
+            case "RUNNING":
+                // No hacer nada, el proceso ya está en ejecución
+                System.out.println("proceso en ejecucion");
+                break;
+            default:
+                System.out.println("Estado desconocido: " + process.getState());
+                break;
         }
-    }
+    }System.out.println("ESTADO DE LAS COLAS:");
+       System.out.println("LISTOS: ");
+       readyQueue.printQueue();
+       System.out.println("BLOQUEADOS");
+       blockedQueue.printQueue();
+       System.out.println("TERMINADOS");
+       finishedQueue.printQueue();
+       
+}
 
     
     // Adaptar el método executeCycle para implementar Round Robin
     public void executeCycle() {
-        globalCycle++;
-        for (Processor processor : processors) {
-            if (processor.isIdle() && !readyQueue.isEmpty()) {
-                Process process = readyQueue.remove(); // Obtener el siguiente proceso
-                processor.assignProcess(process); // Asignar proceso al procesador
+    globalCycle++;
+
+    // Ejecutar procesos en los procesadores
+    for (Processor processor : processors) {
+       if (!processor.isIdle()) {
+          Process process = processor.getCurrentProcess();
+          process.incrementProgramCounter();
+
+            // Verificar si el proceso ha terminado
+//            if (process.hasFinished()) {
+//                process.setState("FINISHED");
+//                System.out.println("Proceso cambio a FINISHED");
+//                finishedQueue.add(process); // Agregar a la cola de finalizados
+//                readyQueue.remove(process); // Eliminar de la cola de listos
+//                processor.releaseProcessor(); // Liberar el procesador
+//               break;
+//            }
+
+            // Verificar si el proceo es I/O Bound y genera una excepción
+            if (!process.isCpuBound() && process.getProgramCounter() % process.getExceptionCycles() == 0) {
+                process.setState("BLOCKED");
+                System.out.println("Proceso cambio a BLOCKED");
+                processor.releaseProcessor(); // Liberar el procesador
+
+                // Iniciar un hilo para manejar la excepción
+                new Thread(() -> handleException(process)).start();
                 
-                //new Thread(process).start(); // Iniciar el proceso en un hilo
             }
-        }
+       }
+     }
+    // Asignar procesos a los procesadores ociosos
+    for (Processor processor : processors) {
+        if (processor.isIdle() && !readyQueue.isEmpty()) {
+            Process process = readyQueue.remove(); // Eliminar de la cola de listos
+            processor.assignProcess(process); // Asignar al procesador
+            process.setState("RUNNING");
+            System.out.println("Proceso cambio a running");
+        }break;
     }
+
+    // Notificar a MainView para actualizar la interfaz gráfica
+    mainView.updatePCBSandQueues();
+}
+
+
 
     private void assignProcesses() {
         for (Processor processor : processors) {
@@ -134,7 +197,20 @@ public class Simulator {
         return sortedQueue; 
     }
     
-    
+        public void handleException(Process process) {
+    try {
+        // Simular el tiempo de satisfacción de la excepción
+        Thread.sleep(process.getSatisfactionCycles() * 1000); // Convertir a milisegundos
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+
+    // Desbloquear el proceso
+    process.setState("READY");
+    System.out.println("El proceso fue desbloqueado y cambio a READY");
+    readyQueue.add(process); // Agregar a la cola de listos
+    blockedQueue.remove(process); // Eliminar de la cola de bloqueados
+}
     
     //SRT (Shortest Remaining Time)
     public ProcessQueue reorderBySRT() {
@@ -268,7 +344,6 @@ public class Simulator {
     public void reorderAndSetReadyQueue() {
         ProcessQueue sortedQueue = schedulingPolicy.reorder(this); 
         setReadyQueue(sortedQueue); 
-        readyQueue.printQueue();
     }
     
     public ProcessQueue getBlockedQueue() { return blockedQueue; }

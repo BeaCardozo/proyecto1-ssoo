@@ -2,7 +2,7 @@ package com.mycompany.proyecto1ssoo;
 
 import java.util.Random;
 
-public class Process{
+public class Process implements Runnable{
     private int id;
     private String name;
     private int instructions; //Como rafaga de CPU
@@ -14,9 +14,10 @@ public class Process{
     private int mar;
     private static int orderCounter = 0; 
     private int arrivalOrder; 
-    private ProcessState state;
+    private String state;
+    private Simulator simulator;
 
-    public Process(String name, int instructions, boolean isCpuBound, int exceptionCycles, int satisfactionCycles) {
+    public Process(String name, int instructions, boolean isCpuBound, int exceptionCycles, int satisfactionCycles, Simulator simulator) {
         this.id =  generateRandomId();
         this.name = name;
         this.instructions = instructions;
@@ -25,15 +26,45 @@ public class Process{
         this.satisfactionCycles = satisfactionCycles;
         this.programCounter = 1;
         this.mar = 0;
-        this.state = ProcessState.READY;
+        this.state = "READY";
          this.arrivalOrder = ++orderCounter;
+        this.simulator = simulator;
     }
     
+    @Override
+    public void run() {
+        while (!hasFinished()) {
+            // Simular la ejecución de una instrucción
+            incrementProgramCounter();
+
+            // Verificar si el proceso es I/O Bound y genera una excepción
+            if (isCpuBound() && getProgramCounter() % getExceptionCycles() == 0) {
+                setState("BLOCKED");
+                // Notificar al simulador para manejar la excepción
+                simulator.handleException(this);
+                break; // Salir del bucle mientras el proceso está bloqueado
+            }
+
+            // Simular el tiempo de ejecución
+            try {
+                Thread.sleep(1000); // 1 segundo por ciclo
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        // Cambiar el estado a Finished cuando el proceso termine
+        setState("FINISHED");
+        System.out.println("Proceso " + getName() + " ha terminado.");
+    }
+
+
     
     private int generateRandomId() {
         Random random = new Random();
         return 1000 + random.nextInt(9000); 
     }
+    
 
 
     public int getId() { return id; }
@@ -46,8 +77,12 @@ public class Process{
     public int getProgramCounter() { return programCounter; }
     public int getMAR() { return mar; }
     public int getArrivalOrder() { return arrivalOrder; }
-    public ProcessState getState() { return state; }
-    public void setState(ProcessState state) { this.state = state; }
+    public String getState() { return state; }
+    
+    public void setState(String state) {
+    this.state = state;
+    System.out.println("Proceso " + this.name + " cambió a estado: " + state);
+}
     public void incrementProgramCounter() { this.programCounter++; }
 
     public boolean hasFinished() {

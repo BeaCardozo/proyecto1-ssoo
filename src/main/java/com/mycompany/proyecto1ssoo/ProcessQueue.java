@@ -28,7 +28,7 @@ public class ProcessQueue {
             end++;
             processes[end] = process;
         } else {
-            System.out.println("Queue full, cannot add more processes.");
+            //System.out.println("Queue full, cannot add more processes.");
         }
     }
 
@@ -45,24 +45,19 @@ public class ProcessQueue {
     
     
     public boolean remove(Process processToRemove) {
-        if (front > end) {
-            System.out.println("Queue empty, no processes to remove.");
-            return false; 
-        }
-        for (int i = front; i <= end; i++) {
-            if (processes[i].equals(processToRemove)) { 
-                for (int j = i; j < end; j++) {
-                    processes[j] = processes[j + 1];
-                }
-                processes[end] = null;
-                end--; 
-                System.out.println("Process removed successfully.");
-                return true; 
+    for (int i = front; i <= end; i++) {
+        if (processes[i].equals(processToRemove)) {
+            // Mover los elementos restantes una posición hacia la izquierda
+            for (int j = i; j < end; j++) {
+                processes[j] = processes[j + 1];
             }
+            processes[end] = null; // Eliminar la referencia al último elemento
+            end--; // Reducir el tamaño de la cola
+            return true; // Proceso eliminado
         }
-        System.out.println("Process not found in the queue.");
-        return false; 
     }
+    return false; // Proceso no encontrado
+}
     
     public boolean containsName(String name) {
         for (int i = front; i <= end; i++) {
@@ -82,10 +77,10 @@ public class ProcessQueue {
     }
     
     public void clear() {
-        front = 0;
-        end = -1;  
-        System.out.println("Queue cleared.");
-    }
+    front = 0;
+    end = -1;
+    System.out.println("Queue cleared."); // Eliminar o mover este mensaje
+}
 
     public Process get(int index) {
         if (index >= 0 && index < size()) {
@@ -95,6 +90,14 @@ public class ProcessQueue {
         }
     }
     
+    public boolean contains(Process processToFind) {
+    for (int i = front; i <= end; i++) {
+        if (processes[i].equals(processToFind)) {
+            return true; // El proceso está en la cola
+        }
+    }
+    return false; // El proceso no está en la cola
+}
     
    public DefaultListModel<String> getProcessNames() {
     DefaultListModel<String> processNamesModel = new DefaultListModel<>();
@@ -146,4 +149,3 @@ public class ProcessQueue {
         System.out.println();
         }
     }
-
