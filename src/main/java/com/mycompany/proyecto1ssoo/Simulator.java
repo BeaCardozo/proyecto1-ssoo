@@ -3,6 +3,7 @@ package com.mycompany.proyecto1ssoo;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import igu.MainView;
+import java.awt.Color;
 /**
  *
  * @author Rodrigo
@@ -53,7 +54,18 @@ public class Simulator {
     public void addProcess(Process process) {
         generalQueue.add(process);
     }
- 
+    
+    public void reset() {
+        this.readyQueue.clear(); 
+        this.blockedQueue.clear();
+        this.finishedQueue.clear();
+        this.generalQueue.clear();
+        for (int i = 0; i < numProcessors; i++) {
+            processors[i].reset(); 
+        }
+        this.globalCycle = 0;
+        this.schedulingPolicy = null; 
+    }
     
    public void classifyProcesses() {
     // No limpiar las colas aquí, solo reclasificar los procesos
@@ -200,6 +212,8 @@ public class Simulator {
         public void handleException(Process process) {
     try {
         // Simular el tiempo de satisfacción de la excepción
+        MainView.ExecutionModeLabel.setForeground(Color.RED);
+        MainView.ExecutionModeLabel.setText("Kernel");
         Thread.sleep(process.getSatisfactionCycles() * 1000); // Convertir a milisegundos
     } catch (InterruptedException e) {
         e.printStackTrace();

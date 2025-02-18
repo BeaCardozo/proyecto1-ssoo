@@ -1,5 +1,7 @@
 package com.mycompany.proyecto1ssoo;
 
+import igu.MainView;
+import java.awt.Color;
 import java.util.Random;
 
 public class Process implements Runnable{
@@ -36,15 +38,16 @@ public class Process implements Runnable{
         while (!hasFinished()) {
             // Simular la ejecución de una instrucción
             incrementProgramCounter();
-
+            incrementMAR();
             // Verificar si el proceso es I/O Bound y genera una excepción
-            if (isCpuBound() && getProgramCounter() % getExceptionCycles() == 0) {
+            if (!isCpuBound() && getProgramCounter() % getExceptionCycles() == 0) {
                 setState("BLOCKED");
                 // Notificar al simulador para manejar la excepción
                 simulator.handleException(this);
+                MainView.ExecutionModeLabel.setForeground(Color.GREEN);
+                MainView.ExecutionModeLabel.setText("User");
                 break; // Salir del bucle mientras el proceso está bloqueado
             }
-
             // Simular el tiempo de ejecución
             try {
                 Thread.sleep(1000); // 1 segundo por ciclo
@@ -84,6 +87,7 @@ public class Process implements Runnable{
     System.out.println("Proceso " + this.name + " cambió a estado: " + state);
 }
     public void incrementProgramCounter() { this.programCounter++; }
+    public void incrementMAR() { this.mar++; }
 
     public boolean hasFinished() {
         return programCounter >= instructions;

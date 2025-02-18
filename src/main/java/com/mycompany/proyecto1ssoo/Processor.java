@@ -41,5 +41,12 @@ public class Processor {
         semaphore.release();
         this.isIdle = true;
     }
+    
+    
+    public void reset() {
+        this.currentProcess = null;
+        this.isIdle = true; 
+        this.semaphore = new Semaphore(1); 
+    }
 
 }

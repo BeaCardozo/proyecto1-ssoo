@@ -18,8 +18,6 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import javax.swing.DefaultListModel;
 
 /**
@@ -90,8 +88,6 @@ public class MainView extends javax.swing.JFrame {
         SimulationPanel = new javax.swing.JPanel();
         SystemPerfomanceMetricsPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        GraphicsPanel = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
         SimulationDetailsPanel = new javax.swing.JPanel();
         DetailsPanel = new javax.swing.JPanel();
         ExecutionModeLabel = new javax.swing.JLabel();
@@ -347,18 +343,7 @@ public class MainView extends javax.swing.JFrame {
         jLabel1.setText("No information available yet.");
         SystemPerfomanceMetricsPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 70, -1, -1));
 
-        SimulationPanel.add(SystemPerfomanceMetricsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, 410, 170));
-
-        GraphicsPanel.setBackground(new java.awt.Color(255, 255, 255));
-        GraphicsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Graphics", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 14))); // NOI18N
-        GraphicsPanel.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        jLabel2.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel2.setText("No information available yet.");
-        GraphicsPanel.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 70, -1, -1));
-
-        SimulationPanel.add(GraphicsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 500, 500, 170));
+        SimulationPanel.add(SystemPerfomanceMetricsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, 940, 170));
 
         SimulationDetailsPanel.setBackground(new java.awt.Color(255, 255, 255));
         SimulationDetailsPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Simulation", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Geeza Pro", 3, 14))); // NOI18N
@@ -474,14 +459,26 @@ public class MainView extends javax.swing.JFrame {
             return;
         }
         if (isSimulationActive) { 
-            // Detener la simulación
-            stopSimulation(); 
-            isSimulationActive = false;
-            ModifySpecificationsButton.setVisible(isSimulationActive);
-            StartSimulationButton.setText("Start Simulation");
-            StartSimulationButton.setBackground(new Color(241, 241, 169));
-            StartSimulationButton.setForeground(Color.BLACK);
-            return; 
+            int response = JOptionPane.showConfirmDialog(
+        this, 
+        "Are you sure you want to delete all simulation data?", 
+        "Confirm", 
+        JOptionPane.YES_NO_OPTION, 
+        JOptionPane.QUESTION_MESSAGE 
+            );
+            if (response == JOptionPane.YES_OPTION) {
+                // Detener la simulación
+                stopSimulation(); 
+                isSimulationActive = false;
+                ModifySpecificationsButton.setVisible(isSimulationActive);
+                //Reestablecer estilos del boton
+                StartSimulationButton.setText("Start Simulation");
+                StartSimulationButton.setBackground(new Color(181,241,169));
+                StartSimulationButton.setForeground(Color.BLACK);
+                return; 
+            } else {
+                return;
+            }  
         } else { 
             saveToFile(); 
             updatePCBSandQueues(); 
@@ -499,11 +496,11 @@ public class MainView extends javax.swing.JFrame {
                  SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
                 simulator.setSchedulingPolicy(policy);
                 simulator.reorderAndSetReadyQueue(); // Imprime la política seleccionada
-                //System.out.println("Selected Policy: " + policy);
             } else {
                 System.out.println("No se ha seleccionado ninguna política.");
             }
-
+            
+            MainView.ExecutionModeLabel.setText("User"); //Ejecucion en modo usuario
             // Crear y empezar el temporizador
             timer = new Timer(cycleDuration * 1000, new ActionListener() {
             @Override
@@ -697,11 +694,20 @@ public class MainView extends javax.swing.JFrame {
     
     //Finalizar la simulacion de forma arbitraria
     private void stopSimulation() {
-        //Mostrar estadisticas hasta el momento y resto de logica que debemos implementar
+        //Limpiar listas
+        simulator.reset();
+        simulator.getGeneralQueue().clear(); //Limpiar toda la lista de procesos
+        simulator.getReadyQueue().clear(); //Limpiar la lista de listos
+        simulator.getBlockedQueue().clear(); //Limpiar la lista de bloqueados
+        simulator.getFinishedQueue().clear(); //Limpiar la lista de terminados
+        updatePCBSandQueues();
+        //Limpiar interfaz
+        ExecutionModeLabel.setText("");
+        updateInterface(); //Limpia la tabla de procesos
+        updateButtonStates(); //Cambia el estado de los botones 
         PCBMainPanel.removeAll(); //Limpiar PCBs
         TableProcessorsPanel.removeAll();//Limpiar tabla de procesadores por proceso
         GlobalClockSimulationLabel.setText("Global Clock Cycle Number: 0");
-        //Limpiar listas
         ReadyQueueList.setModel(new DefaultListModel<>());
         BlockedQueueList.setModel(new DefaultListModel<>());
         FinishedQueueList.setModel(new DefaultListModel<>());
@@ -788,7 +794,7 @@ public class MainView extends javax.swing.JFrame {
         JOptionPane.showMessageDialog(null, "Error! Data not saved!");
     }
 }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup ActiveProcessorsGroup;
     private javax.swing.JLabel ActiveProcessorsTextField;
@@ -806,11 +812,10 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JSpinner CyclesSatisfyExcepSpinner;
     private javax.swing.JButton DeleteProcessButton;
     private javax.swing.JPanel DetailsPanel;
-    private javax.swing.JLabel ExecutionModeLabel;
+    public static javax.swing.JLabel ExecutionModeLabel;
     private javax.swing.JLabel FinishedQueueLabel;
     private javax.swing.JList<String> FinishedQueueList;
     private javax.swing.JLabel GlobalClockSimulationLabel;
-    private javax.swing.JPanel GraphicsPanel;
     private javax.swing.JRadioButton IOBoundOption;
     private javax.swing.JPanel IOBoundPanel;
     private javax.swing.JLabel ModeLabel;
@@ -840,7 +845,6 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> TimeUnitComboBox;
     private javax.swing.JRadioButton TwoProcessorsOption;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
