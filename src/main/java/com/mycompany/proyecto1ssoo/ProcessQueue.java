@@ -79,7 +79,7 @@ public class ProcessQueue {
     public void clear() {
     front = 0;
     end = -1;
-    System.out.println("Queue cleared."); // Eliminar o mover este mensaje
+    //System.out.println("Queue cleared."); // Eliminar o mover este mensaje
 }
 
     public Process get(int index) {

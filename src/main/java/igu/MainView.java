@@ -32,7 +32,7 @@ public class MainView extends javax.swing.JFrame {
     
     public MainView() {
         initComponents();
-        simulator = new Simulator(3,this);
+        simulator = new Simulator(2,this);
         updateButtonStates(); 
         setTitle("Process Simulator");
         disableJPanel(IOBoundPanel, IOBoundOption.isSelected());
@@ -481,6 +481,7 @@ public class MainView extends javax.swing.JFrame {
             }  
         } else { 
             saveToFile(); 
+            //System.out.println("CICLO INICIAL");
             updatePCBSandQueues(); 
             disablePanels(false); 
             enablePanels(true);
@@ -489,13 +490,14 @@ public class MainView extends javax.swing.JFrame {
             StartSimulationButton.setBackground(Color.RED);
             StartSimulationButton.setForeground(Color.WHITE);
             int cycleDuration = Integer.parseInt(CycleDurationTextField.getText());
+            simulator.setCycleDuration(cycleDuration);
             int numProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
             simulator.setNumProcessors(numProcessors); 
             String selectedItem = SchedulingPolicyComboBox.getSelectedItem().toString();
             if (selectedItem != null) {
                  SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
                 simulator.setSchedulingPolicy(policy);
-                simulator.reorderAndSetReadyQueue(); // Imprime la política seleccionada
+               // simulator.reorderAndSetReadyQueue(); // Imprime la política seleccionada
             } else {
                 System.out.println("No se ha seleccionado ninguna política.");
             }
@@ -510,6 +512,7 @@ public class MainView extends javax.swing.JFrame {
                     simulator.setGlobalCycle(0);
                     return; 
                 }
+                
                 simulator.executeCycle(); 
                 GlobalClockSimulationLabel.setText("Global Clock Cycle Number: " + simulator.getGlobalCycle());
                 updatePCBSandQueues(); 
@@ -522,6 +525,7 @@ public class MainView extends javax.swing.JFrame {
             timer.start(); // Iniciar el temporizador
             isSimulationActive = true; 
             ModifySpecificationsButton.setVisible(isSimulationActive);
+            //System.out.println("CICLO INICIAL 2");
             updatePCBSandQueues();
         }
     }//GEN-LAST:event_StartSimulationButtonActionPerformed
@@ -552,10 +556,9 @@ public class MainView extends javax.swing.JFrame {
         
         // Crear el proceso
         Process process = new Process(name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle, simulator); //id se asigna automatico
-    
+        simulator.getReadyQueue().add(process);
         // Agregar el proceso al simulador
-        //ProcessQueue readyQueue = new ProcessQueue(3);
-        //esto genera que se active el botron start sikmul
+ //       ProcessQueue readyQueue = new ProcessQueue(3);
         simulator.addProcess(process);
 
         DefaultTableModel modelo = (DefaultTableModel) ProcessTable.getModel();
@@ -610,7 +613,7 @@ public class MainView extends javax.swing.JFrame {
             if (selectedItem != null) {
                 SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
                 simulator.setSchedulingPolicy(policy);
-                simulator.reorderAndSetReadyQueue(); 
+                //simulator.reorderAndSetReadyQueue(); 
                 System.out.println("Selected Policy: " + policy);
             } else {
                 System.out.println("No se ha seleccionado ninguna política.");

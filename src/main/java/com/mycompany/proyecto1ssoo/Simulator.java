@@ -19,9 +19,11 @@ public class Simulator {
     private int numProcessors; 
     private MainView mainView;
     private static Simulator instance;
+    private int cycleDuration;
 
-    public Simulator(int numProcessors, MainView mainView) {
+    public Simulator(int numProcessors,MainView mainView) {
         this.numProcessors = numProcessors;  
+        this.cycleDuration = cycleDuration;
         this.readyQueue = new ProcessQueue(100);
         this.blockedQueue = new ProcessQueue(100);
         this.finishedQueue = new ProcessQueue(100);
@@ -37,7 +39,7 @@ public class Simulator {
     
     public static Simulator getInstance(int numProcessors, MainView mainView) {
         if (instance == null) {
-            instance = new Simulator(numProcessors, mainView); // Pasar mainView al constructor
+            instance = new Simulator(numProcessors,mainView); // Pasar mainView al constructor
         }
         return instance;
     }
@@ -76,87 +78,74 @@ public class Simulator {
             case"READY":
                 if (!readyQueue.contains(process)) {
                     readyQueue.add(process); // Agregar a la cola de listos si no está ya
-                    System.out.println("Proceso "+process.getName()+" agregado a la cola de listos");
+                    blockedQueue.remove(process);
                 }
                 break;
             case "BLOCKED":
                 if (!blockedQueue.contains(process)) {
                     blockedQueue.add(process); // Agregar a la cola de bloqueados si no está ya
-                    System.out.println("Proceso "+process.getName()+" agregado a la cola de bloqueados");
+                    readyQueue.remove(process);
                 }
                 break;
             case "FINISHED":
                 if (!finishedQueue.contains(process)) {
                     finishedQueue.add(process); // Agregar a la cola de finalizados si no está ya
-                    System.out.println("Proceso "+process.getName()+" agregado a la cola de terminados");
+                    blockedQueue.remove(process);
+                    readyQueue.remove(process);
                 }
                 break;
             case "RUNNING":
                 // No hacer nada, el proceso ya está en ejecución
-                System.out.println("proceso en ejecucion");
+                readyQueue.remove(process);
                 break;
             default:
                 System.out.println("Estado desconocido: " + process.getState());
                 break;
         }
-    }System.out.println("ESTADO DE LAS COLAS:");
-       System.out.println("LISTOS: ");
-       readyQueue.printQueue();
-       System.out.println("BLOQUEADOS");
-       blockedQueue.printQueue();
-       System.out.println("TERMINADOS");
-       finishedQueue.printQueue();
-       
-}
+    }
 
+}
     
     // Adaptar el método executeCycle para implementar Round Robin
     public void executeCycle() {
     globalCycle++;
-
-    // Ejecutar procesos en los procesadores
-    for (Processor processor : processors) {
-       if (!processor.isIdle()) {
-          Process process = processor.getCurrentProcess();
-          process.incrementProgramCounter();
-
-            // Verificar si el proceso ha terminado
-//            if (process.hasFinished()) {
-//                process.setState("FINISHED");
-//                System.out.println("Proceso cambio a FINISHED");
-//                finishedQueue.add(process); // Agregar a la cola de finalizados
-//                readyQueue.remove(process); // Eliminar de la cola de listos
-//                processor.releaseProcessor(); // Liberar el procesador
-//               break;
-//            }
-
-            // Verificar si el proceo es I/O Bound y genera una excepción
-            if (!process.isCpuBound() && process.getProgramCounter() % process.getExceptionCycles() == 0) {
-                process.setState("BLOCKED");
-                System.out.println("Proceso cambio a BLOCKED");
-                processor.releaseProcessor(); // Liberar el procesador
-
-                // Iniciar un hilo para manejar la excepción
-                new Thread(() -> handleException(process)).start();
-                
-            }
-       }
-     }
-    // Asignar procesos a los procesadores ociosos
-    for (Processor processor : processors) {
-        if (processor.isIdle() && !readyQueue.isEmpty()) {
+    
+        // Asignar procesos a los procesadores ociosos
+    for (int i =0;i<processors.length; i++) {
+        if (processors[i].isIdle()&&!readyQueue.isEmpty()) {
             Process process = readyQueue.remove(); // Eliminar de la cola de listos
-            processor.assignProcess(process); // Asignar al procesador
-            process.setState("RUNNING");
-            System.out.println("Proceso cambio a running");
-        }break;
+            processors[i].assignProcess(process); // Asignar al procesador
+        }
     }
-
-    // Notificar a MainView para actualizar la interfaz gráfica
-    mainView.updatePCBSandQueues();
+    
+    for (int i=0;i<processors.length;i++) {
+        if (!processors[i].isIdle()) {
+            Process process = processors[i].getCurrentProcess();
+            // Verificar si el proceso ha terminado
+            if (process.hasFinished()) {
+                processors[i].releaseProcessor(); // Liberar el procesador
+                process.setState("FINISHED");  
+                break;
+            }
+            else if (process.isBlocked() && processors[i].cycles_blocked != process.getSatisfactionCycles()&&!("READY").equals(process.getState())){ 
+                process.setState("BLOCKED");
+                processors[i].cycles_blocked++;
+                MainView.ExecutionModeLabel.setForeground(Color.RED);
+                MainView.ExecutionModeLabel.setText("Kernel");
+            }else if(process.isBlocked() && processors[i].cycles_blocked ==process.getSatisfactionCycles()){
+                processors[i].cycles_blocked =0;
+                process.setState("READY");
+                processors[i].releaseProcessor();
+                break;
+            }
+            else if("READY".equals(process.getState())||"RUNNING".equals(process.getState())){
+                process.setState("RUNNING");
+                process.incrementProgramCounter();
+                process.incrementMAR();
+            }                      
+        }
+    }
 }
-
-
 
     private void assignProcesses() {
         for (Processor processor : processors) {
@@ -166,8 +155,7 @@ public class Simulator {
             }
         }
     }
-    
-    
+      
       //Llenar tabla de procesos:
     public DefaultTableModel updateProcessTable() {
         DefaultTableModel model = new DefaultTableModel();
@@ -208,23 +196,6 @@ public class Simulator {
         }
         return sortedQueue; 
     }
-    
-        public void handleException(Process process) {
-    try {
-        // Simular el tiempo de satisfacción de la excepción
-        MainView.ExecutionModeLabel.setForeground(Color.RED);
-        MainView.ExecutionModeLabel.setText("Kernel");
-        Thread.sleep(process.getSatisfactionCycles() * 1000); // Convertir a milisegundos
-    } catch (InterruptedException e) {
-        e.printStackTrace();
-    }
-
-    // Desbloquear el proceso
-    process.setState("READY");
-    System.out.println("El proceso fue desbloqueado y cambio a READY");
-    readyQueue.add(process); // Agregar a la cola de listos
-    blockedQueue.remove(process); // Eliminar de la cola de bloqueados
-}
     
     //SRT (Shortest Remaining Time)
     public ProcessQueue reorderBySRT() {
@@ -363,4 +334,12 @@ public class Simulator {
     public ProcessQueue getBlockedQueue() { return blockedQueue; }
     public ProcessQueue getFinishedQueue() { return finishedQueue; }
     public ProcessQueue getGeneralQueue() { return generalQueue; }
+    
+    public int getCycleDuration (){
+        return cycleDuration;
+    }
+    
+    public void setCycleDuration (int cycleDuration){
+        cycleDuration = cycleDuration;
+    }
 }

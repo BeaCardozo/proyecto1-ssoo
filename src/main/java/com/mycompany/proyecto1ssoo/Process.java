@@ -35,37 +35,26 @@ public class Process implements Runnable{
     
     @Override
     public void run() {
-        while (!hasFinished()) {
-            // Simular la ejecución de una instrucción
-            incrementProgramCounter();
-            incrementMAR();
-            // Verificar si el proceso es I/O Bound y genera una excepción
-            if (!isCpuBound() && getProgramCounter() % getExceptionCycles() == 0) {
-                setState("BLOCKED");
-                // Notificar al simulador para manejar la excepción
-                simulator.handleException(this);
-                MainView.ExecutionModeLabel.setForeground(Color.GREEN);
-                MainView.ExecutionModeLabel.setText("User");
-                break; // Salir del bucle mientras el proceso está bloqueado
-            }
-            // Simular el tiempo de ejecución
-            try {
-                Thread.sleep(1000); // 1 segundo por ciclo
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            // Simular la ejecución de una instrucción
+}
+
+    
+    public boolean isBlocked(){
+        if (!isCpuBound() && getProgramCounter() % getExceptionCycles() == 0){
+            return true;
+        }else{
+            return false;
         }
-
-        // Cambiar el estado a Finished cuando el proceso termine
-        setState("FINISHED");
-        System.out.println("Proceso " + getName() + " ha terminado.");
     }
-
 
     
     private int generateRandomId() {
         Random random = new Random();
         return 1000 + random.nextInt(9000); 
+    }
+    
+    private int getCycleDuration(){
+        return simulator.getCycleDuration();
     }
     
 
@@ -84,7 +73,6 @@ public class Process implements Runnable{
     
     public void setState(String state) {
     this.state = state;
-    System.out.println("Proceso " + this.name + " cambió a estado: " + state);
 }
     public void incrementProgramCounter() { this.programCounter++; }
     public void incrementMAR() { this.mar++; }

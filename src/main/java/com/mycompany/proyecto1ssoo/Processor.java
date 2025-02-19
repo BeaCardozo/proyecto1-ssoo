@@ -9,12 +9,14 @@ public class Processor {
     private Process currentProcess; 
     public boolean isIdle;
     private Semaphore semaphore;
+    public int cycles_blocked;
 
     public Processor(int id) {
         this.id = id;
         this.currentProcess = null;
         this.semaphore = new Semaphore(1);
         this.isIdle = true;
+        this.cycles_blocked = 0;
     }
 
     public int getId() { return id; }
@@ -26,8 +28,7 @@ public class Processor {
             semaphore.acquire(); // Adquirir el semáforo
             this.isIdle = false;
             this.currentProcess = process;
-            //process.setState("RUNNING");
-
+            
             // Iniciar un hilo para ejecutar el proceso
             Thread processThread = new Thread(process);
             processThread.start();
