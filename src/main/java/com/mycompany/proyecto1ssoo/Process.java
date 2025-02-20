@@ -23,6 +23,7 @@ public class Process implements Runnable{
         this.id =  generateRandomId();
         this.name = name;
         this.instructions = instructions;
+        this.remainingInstructions = 0;
         this.isCpuBound = isCpuBound;
         this.exceptionCycles = exceptionCycles;
         this.satisfactionCycles = satisfactionCycles;
@@ -62,7 +63,10 @@ public class Process implements Runnable{
     public int getId() { return id; }
     public String getName() { return name; }
     public int getInstructions() { return instructions; }
-    public int getRemainingInstructions() { return instructions; }
+    public int getRemainingInstructions() { return remainingInstructions; }
+    public void setRemainingInstructions(int NumberOfinstructions) {
+        this.remainingInstructions = NumberOfinstructions;
+    }
     public boolean isCpuBound() { return isCpuBound; }
     public int getExceptionCycles() { return exceptionCycles; }
     public int getSatisfactionCycles() { return satisfactionCycles; }
@@ -78,7 +82,7 @@ public class Process implements Runnable{
     public void incrementMAR() { this.mar++; }
 
     public boolean hasFinished() {
-        return programCounter >= instructions;
+        return mar >= instructions; //esto deberia ser el MAR
     }
 
 }

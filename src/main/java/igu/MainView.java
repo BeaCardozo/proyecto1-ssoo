@@ -296,7 +296,7 @@ public class MainView extends javax.swing.JFrame {
         ActiveProcessorsGroup.add(ThreeProcessorsOption);
         ThreeProcessorsOption.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         ThreeProcessorsOption.setText("3");
-        SystemSpecificationsPanel.add(ThreeProcessorsOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 70, -1, -1));
+        SystemSpecificationsPanel.add(ThreeProcessorsOption, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 70, -1, -1));
 
         TimeUnitComboBox.setFont(new java.awt.Font("Geneva", 1, 11)); // NOI18N
         TimeUnitComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "s", "ms" }));
@@ -341,7 +341,7 @@ public class MainView extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Geeza Pro", 3, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(153, 153, 153));
         jLabel1.setText("No information available yet.");
-        SystemPerfomanceMetricsPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 70, -1, -1));
+        SystemPerfomanceMetricsPanel.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 80, -1, -1));
 
         SimulationPanel.add(SystemPerfomanceMetricsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 500, 940, 170));
 

@@ -131,7 +131,7 @@ public class Simulator {
                 process.setState("BLOCKED");
                 processors[i].cycles_blocked++;
                 MainView.ExecutionModeLabel.setForeground(Color.RED);
-                MainView.ExecutionModeLabel.setText("Kernel");
+                MainView.ExecutionModeLabel.setText("Operative System");
             }else if(process.isBlocked() && processors[i].cycles_blocked ==process.getSatisfactionCycles()){
                 processors[i].cycles_blocked =0;
                 process.setState("READY");
@@ -140,8 +140,13 @@ public class Simulator {
             }
             else if("READY".equals(process.getState())||"RUNNING".equals(process.getState())){
                 process.setState("RUNNING");
-                process.incrementProgramCounter();
                 process.incrementMAR();
+                if (process.getMAR() < process.getInstructions()) {
+                    process.incrementProgramCounter();
+                } 
+                // Set remaining instructions
+                int remaining = process.getInstructions() - process.getMAR();
+                process.setRemainingInstructions(remaining);
             }                      
         }
     }
