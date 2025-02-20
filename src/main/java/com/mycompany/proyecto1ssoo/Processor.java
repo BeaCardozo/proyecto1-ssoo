@@ -75,6 +75,8 @@ public class Processor {
     }
     
     
+    
+    
     public void reset() {
         this.currentProcess = null;
         this.isIdle = true;

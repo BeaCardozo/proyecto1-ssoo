@@ -41,7 +41,7 @@ public class MainView extends javax.swing.JFrame {
     
     public MainView() {
         initComponents();
-        simulator = new Simulator(3,this);
+        simulator = new Simulator(3, this);
         updateButtonStates(); 
         setTitle("Process Simulator");
         disableJPanel(IOBoundPanel, IOBoundOption.isSelected());
@@ -123,6 +123,7 @@ public class MainView extends javax.swing.JFrame {
         CPUMetricsPanel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         IndividualCPUTable = new javax.swing.JTable();
+        LoadTXTButton1 = new javax.swing.JButton();
         SimulationDetailsPanel = new javax.swing.JPanel();
         DetailsPanel = new javax.swing.JPanel();
         ExecutionModeLabel = new javax.swing.JLabel();
@@ -145,6 +146,7 @@ public class MainView extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMaximumSize(new java.awt.Dimension(1300, 725));
         setMinimumSize(new java.awt.Dimension(1300, 725));
         setResizable(false);
         setSize(new java.awt.Dimension(1300, 725));
@@ -474,7 +476,20 @@ public class MainView extends javax.swing.JFrame {
         IndividualCPUTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane3.setViewportView(IndividualCPUTable);
 
-        CPUMetricsPanel.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 590, 140));
+        CPUMetricsPanel.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 590, 90));
+
+        LoadTXTButton1.setBackground(new java.awt.Color(153, 51, 255));
+        LoadTXTButton1.setFont(new java.awt.Font("Geeza Pro", 1, 12)); // NOI18N
+        LoadTXTButton1.setForeground(new java.awt.Color(255, 255, 255));
+        LoadTXTButton1.setText("See Graph");
+        LoadTXTButton1.setBorderPainted(false);
+        LoadTXTButton1.setOpaque(true);
+        LoadTXTButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LoadTXTButton1ActionPerformed(evt);
+            }
+        });
+        CPUMetricsPanel.add(LoadTXTButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 120, 150, 40));
 
         SystemPerfomanceMetricsPanel.add(CPUMetricsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 20, 610, 170));
 
@@ -645,13 +660,13 @@ public class MainView extends javax.swing.JFrame {
             } 
             simulator.setCycleDuration(cycleDuration);
             int numProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
-            simulator.setNumProcessors(numProcessors); 
+            simulator.setNumProcessors(numProcessors);
+            simulator.adjustListSize(numProcessors);
             String selectedItem = SchedulingPolicyComboBox.getSelectedItem().toString();
             if (selectedItem != null) {
                SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
                simulator.setSchedulingPolicy(policy);
                simulator.classifyProcesses();
-               //simulator.reorderAndSetReadyQueue();
             } else {
                 System.out.println("No se ha seleccionado ninguna política.");
             }
@@ -763,7 +778,6 @@ public class MainView extends javax.swing.JFrame {
             if (selectedItem != null) {
                 SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
                 simulator.setSchedulingPolicy(policy);
-                //simulator.reorderAndSetReadyQueue(); 
                 System.out.println("Selected Policy: " + policy);
             } else {
                 System.out.println("No se ha seleccionado ninguna política.");
@@ -773,6 +787,10 @@ public class MainView extends javax.swing.JFrame {
     private void LoadTXTButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadTXTButtonActionPerformed
         loadTxtFile();
     }//GEN-LAST:event_LoadTXTButtonActionPerformed
+
+    private void LoadTXTButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadTXTButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_LoadTXTButton1ActionPerformed
     
     
     //FUNCIONES 
@@ -969,6 +987,10 @@ public class MainView extends javax.swing.JFrame {
         }
     }
     
+    private void showErrorDialog(String message) {
+        JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    
     //LEER TXT
     private void loadTxtFile() {
         JFileChooser fileChooser = new JFileChooser();
@@ -1010,7 +1032,11 @@ public class MainView extends javax.swing.JFrame {
                                 process = new Process(name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle, simulator);
                                 simulator.getGeneralQueue().add(process);
                             } catch (NumberFormatException e) {
-                                e.printStackTrace();
+                                showErrorDialog("Invalid File! Error: " + line);
+                                return; 
+                            } catch (ArrayIndexOutOfBoundsException e) {
+                                showErrorDialog("Invalid File! Error: " + line);
+                                return; 
                             }
                         } else {
                             System.out.println("La línea no tiene la cantidad esperada de datos: " + line);
@@ -1030,13 +1056,20 @@ public class MainView extends javax.swing.JFrame {
                                     numberOfActiveProcessors = configParts[1].trim();
                                     selectRadioButton(numberOfActiveProcessors, ActiveProcessorsGroup);
                                     simulator.setNumProcessors(Integer.parseInt(numberOfActiveProcessors));
+                                    simulator.adjustListSize(Integer.parseInt(numberOfActiveProcessors));
                                     break;
                                 case "Planning Policy":
                                     planningPolicy = configParts[1].trim();
                                     simulator.setSchedulingPolicy(SchedulingPolicy.fromString(planningPolicy));
                                     SchedulingPolicyComboBox.setSelectedItem(planningPolicy);
                                     break;
+                                default:
+                                showErrorDialog("Invalid File! Error: " + line);
+                                return; 
                             }
+                        } else {
+                            showErrorDialog("Invalid File! Error: " + line);
+                            return;
                         }
                     }
                 }
@@ -1057,7 +1090,7 @@ public class MainView extends javax.swing.JFrame {
                 updateInterface();
                 updateButtonStates();
             } catch (IOException e) {
-                e.printStackTrace(); // Manejo de excepciones
+                e.printStackTrace(); 
             }
         }
     }
@@ -1090,6 +1123,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JPanel IOBoundPanel;
     public javax.swing.JTable IndividualCPUTable;
     public javax.swing.JButton LoadTXTButton;
+    public javax.swing.JButton LoadTXTButton1;
     public javax.swing.JLabel MetricPlanningPolicyLabel;
     private javax.swing.JLabel ModeLabel;
     private javax.swing.JButton ModifySpecificationsButton;

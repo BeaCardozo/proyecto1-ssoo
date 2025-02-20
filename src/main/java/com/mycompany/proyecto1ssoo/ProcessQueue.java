@@ -43,6 +43,21 @@ public class ProcessQueue {
         }
     }
     
+    // Obtener el índice del frente de la cola
+    public int getFront() {
+        return front;
+    }
+
+    // Obtener el índice del final de la cola
+    public int getEnd() {
+        return end;
+    }
+    
+      public int decreaseEnd() {
+        return end--;
+    }
+
+    
     
     public boolean remove(Process processToRemove) {
     for (int i = front; i <= end; i++) {
@@ -109,6 +124,15 @@ public class ProcessQueue {
     }
     return processNamesModel;
     }
+   
+   
+   public Process[] getProcesses() {
+        Process[] currentProcesses = new Process[end + 1];
+        System.arraycopy(processes, 0, currentProcesses, 0, end + 1);
+        return currentProcesses; // Devuelve solo los procesos en uso
+    }
+    
+
 
     public void iterateProcesses(BufferedWriter writer) throws IOException {
     if (isEmpty()) {

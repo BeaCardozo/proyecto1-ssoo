@@ -7,8 +7,8 @@ import java.util.Random;
 public class Process implements Runnable{
     private int id;
     private String name;
-    private int instructions; //Como rafaga de CPU
-    private int remainingInstructions;//rafaga restante, lo que queda para que termine de ejecutarse
+    private int instructions; 
+    private int remainingInstructions;
     private boolean isCpuBound;
     private int exceptionCycles;
     private int satisfactionCycles;
@@ -16,6 +16,7 @@ public class Process implements Runnable{
     private int mar;
     private static int orderCounter = 0; 
     private int arrivalOrder; 
+      private int executeCycles; 
     private String state;
     private Simulator simulator;
 
@@ -32,6 +33,7 @@ public class Process implements Runnable{
         this.state = "READY";
          this.arrivalOrder = ++orderCounter;
         this.simulator = simulator;
+         this.executeCycles = 0;
     }
     
     @Override
@@ -47,7 +49,6 @@ public class Process implements Runnable{
             return false;
         }
     }
-
     
     private int generateRandomId() {
         Random random = new Random();
@@ -58,12 +59,27 @@ public class Process implements Runnable{
         return simulator.getCycleDuration();
     }
     
+    
+    // Método para incrementar el contador de ciclos
+    public void incrementExecuteCycles() {
+        this.executeCycles++;
+    }
+
+    // Método para obtener el contador de ciclos
+    public int getExecuteCycles() {
+        return this.executeCycles;
+    }
+
+    // Método para reiniciar el contador de ciclos
+    public void resetExecuteCycles() {
+        this.executeCycles = 0;
+    }
 
 
     public int getId() { return id; }
     public String getName() { return name; }
     public int getInstructions() { return instructions; }
-    public int getRemainingInstructions() { return remainingInstructions; }
+    public int getRemainingInstructions() { return instructions - mar; }
     public void setRemainingInstructions(int NumberOfinstructions) {
         this.remainingInstructions = NumberOfinstructions;
     }
