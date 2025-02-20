@@ -19,7 +19,13 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.awt.Component;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.Enumeration;
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 
 /**
  *
@@ -29,12 +35,13 @@ public class MainView extends javax.swing.JFrame {
     private Simulator simulator;
     public boolean isSimulationActive = false; 
     public boolean isSimulationFinished = false;
+    public boolean isLoadTXTAvailable = true;
     public Timer timer;
     
     
     public MainView() {
         initComponents();
-        simulator = new Simulator(2,this);
+        simulator = new Simulator(3,this);
         updateButtonStates(); 
         setTitle("Process Simulator");
         disableJPanel(IOBoundPanel, IOBoundOption.isSelected());
@@ -95,6 +102,7 @@ public class MainView extends javax.swing.JFrame {
         TimeUnitComboBox = new javax.swing.JComboBox<>();
         ModifySpecificationsButton = new javax.swing.JButton();
         StartSimulationButton = new javax.swing.JButton();
+        LoadTXTButton = new javax.swing.JButton();
         SimulationPanel = new javax.swing.JPanel();
         SystemPerfomanceMetricsPanel = new javax.swing.JPanel();
         SystemMetricsPanel = new javax.swing.JPanel();
@@ -353,7 +361,20 @@ public class MainView extends javax.swing.JFrame {
                 StartSimulationButtonActionPerformed(evt);
             }
         });
-        ConfigPanel.add(StartSimulationButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 630, 310, 40));
+        ConfigPanel.add(StartSimulationButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 640, 150, 40));
+
+        LoadTXTButton.setBackground(new java.awt.Color(51, 51, 255));
+        LoadTXTButton.setFont(new java.awt.Font("Geneva", 1, 14)); // NOI18N
+        LoadTXTButton.setForeground(new java.awt.Color(255, 255, 255));
+        LoadTXTButton.setText("Load TXT");
+        LoadTXTButton.setBorderPainted(false);
+        LoadTXTButton.setOpaque(true);
+        LoadTXTButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                LoadTXTButtonActionPerformed(evt);
+            }
+        });
+        ConfigPanel.add(LoadTXTButton, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 640, 150, 40));
 
         getContentPane().add(ConfigPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 340, 700));
 
@@ -750,6 +771,10 @@ public class MainView extends javax.swing.JFrame {
                 System.out.println("No se ha seleccionado ninguna política.");
             }
     }//GEN-LAST:event_ModifySpecificationsButtonActionPerformed
+
+    private void LoadTXTButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadTXTButtonActionPerformed
+        loadTxtFile();
+    }//GEN-LAST:event_LoadTXTButtonActionPerformed
     
     
     //FUNCIONES
@@ -826,6 +851,7 @@ public class MainView extends javax.swing.JFrame {
         ClearProcessTableButton.setEnabled(!isQueueEmpty);
         DeleteProcessButton.setEnabled(!isQueueEmpty);
         StartSimulationButton.setEnabled(!isQueueEmpty);
+        LoadTXTButton.setEnabled(isQueueEmpty);
     }
     
     //Tomar el proceso seleccionado en tabla
@@ -938,7 +964,143 @@ public class MainView extends javax.swing.JFrame {
         ex.printStackTrace();
         JOptionPane.showMessageDialog(null, "Error! Data not saved!");
     }
-}
+    }
+    
+    private static void selectRadioButton(String option, ButtonGroup buttonGroup) {
+        // Obtener la enumeración de los botones en el ButtonGroup
+        Enumeration<AbstractButton> buttons = buttonGroup.getElements();
+        
+        // Iterar sobre los botones
+        while (buttons.hasMoreElements()) {
+            AbstractButton button = buttons.nextElement(); // Obtener el botón
+            if (button.getText().equals(option)) {
+                button.setSelected(true); // Seleccionar el botón correspondiente
+                break; // Salir si encontramos la opción
+            }
+        }
+    }
+    
+    
+    //LEER TXT
+    private void loadTxtFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        int option = fileChooser.showOpenDialog(null);
+
+        if (option == JFileChooser.APPROVE_OPTION) {
+            String filePath = fileChooser.getSelectedFile().getAbsolutePath();
+        Process process = null;
+
+        // Variables para la sección de configuración
+        String cycleDuration = "";
+        String numberOfActiveProcessors = "";
+        String planningPolicy = "";
+            try {
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+
+            String line;
+            boolean isProcessSection = false;
+            boolean isConfigSection = false;
+
+
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("#PROCESS")) {
+                    isProcessSection = true;
+                    isConfigSection = false; 
+                    continue;
+                } else if (line.startsWith("#CONFIG")) {
+                    isConfigSection = true;
+                    isProcessSection = false; 
+                    continue;
+                }
+
+                // Almacenar datos de procesos
+                if (isProcessSection) {
+                    String[] processData = line.split(","); 
+                    System.out.println("Leyendo línea de procesos: " + line); 
+
+                    if (processData.length >= 8) { 
+                        try {
+                            String name = processData[1].trim();
+                            int numberOfInstructions = Integer.parseInt(processData[2].trim());
+                            boolean isCpuBound = Boolean.parseBoolean(processData[3].trim());
+                            int exceptionCycle = Integer.parseInt(processData[4].trim());
+                            int satisfactionCycle = Integer.parseInt(processData[5].trim());
+
+                            // Crear el objeto Process 
+                            process = new Process(name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle, simulator);
+                            simulator.getGeneralQueue().add(process);
+                            
+                        } catch (NumberFormatException e) {
+                            System.out.println("Error al procesar la línea del proceso: " + line);
+                            e.printStackTrace();
+                        }
+                    } else {
+                        System.out.println("La línea no tiene la cantidad esperada de datos: " + line);
+                    }
+                }
+
+                // Almacenar datos de configuración
+                if (isConfigSection) {
+                    String[] configParts = line.split(":");
+                    if (configParts.length == 2) {
+                        switch (configParts[0].trim()) {
+                            case "Cycle Duration":
+                                cycleDuration = configParts[1].trim();
+                                simulator.setCycleDuration(Integer.parseInt(cycleDuration));
+                                CycleDurationTextField.setText(cycleDuration);
+                                break;
+                            case "Number of Active Processors":
+                                numberOfActiveProcessors = configParts[1].trim();
+                                selectRadioButton(numberOfActiveProcessors, ActiveProcessorsGroup);
+                                simulator.setNumProcessors(Integer.parseInt(numberOfActiveProcessors));
+                                
+                                break;
+                            case "Planning Policy":
+                                planningPolicy = configParts[1].trim();
+                                simulator.setSchedulingPolicy(SchedulingPolicy.fromString(planningPolicy));
+                                SchedulingPolicyComboBox.setSelectedItem(planningPolicy);
+                                break;
+                        }
+                    }
+                    
+         
+                }
+            }
+
+            reader.close();
+
+            // Mostrar la información del objeto process
+            if (process != null) {
+                System.out.println("Proceso creado:");
+                System.out.println("Nombre: " + process.getName());
+                System.out.println("Número de Instrucciones: " + process.getInstructions());
+                System.out.println("Es CPU Bound: " + process.isCpuBound());
+                System.out.println("Ciclo de Excepción: " + process.getExceptionCycles());
+                System.out.println("Ciclo de Satisfacción: " + process.getSatisfactionCycles());
+            } else {
+                 System.out.println("procesos es null");
+            }
+
+            // Mostrar la información de la configuración
+            System.out.println("\nConfiguración:");
+            System.out.println("Duración del Ciclo: " + cycleDuration);
+            System.out.println("Número de Procesadores Activos: " + numberOfActiveProcessors);
+            System.out.println("Política de Planificación: " + planningPolicy);
+            
+            
+            updateInterface();
+            updateButtonStates();
+
+        } catch (IOException e) {
+            e.printStackTrace(); // Manejo de excepciones
+        }
+    
+        }
+        
+        
+    }
+    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup ActiveProcessorsGroup;
@@ -965,6 +1127,7 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JRadioButton IOBoundOption;
     private javax.swing.JPanel IOBoundPanel;
     public javax.swing.JTable IndividualCPUTable;
+    public javax.swing.JButton LoadTXTButton;
     public javax.swing.JLabel MetricPlanningPolicyLabel;
     private javax.swing.JLabel ModeLabel;
     private javax.swing.JButton ModifySpecificationsButton;
