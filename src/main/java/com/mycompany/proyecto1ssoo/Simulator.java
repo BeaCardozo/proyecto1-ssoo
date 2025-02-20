@@ -1,9 +1,10 @@
 package com.mycompany.proyecto1ssoo;
 
-import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import igu.MainView;
 import java.awt.Color;
+import java.text.DecimalFormat;
+import javax.swing.JOptionPane;
 /**
  *
  * @author Rodrigo
@@ -13,8 +14,9 @@ public class Simulator {
     private ProcessQueue blockedQueue;
     private ProcessQueue finishedQueue;
     private ProcessQueue generalQueue;
-    private Processor[] processors;
+    public Processor[] processors;
     private int globalCycle;
+    private int totalGlobalCycle;
     private SchedulingPolicy schedulingPolicy;
     private int numProcessors; 
     private MainView mainView;
@@ -57,6 +59,14 @@ public class Simulator {
         generalQueue.add(process);
     }
     
+    public void setTotalGlobalCycle() {
+        this.totalGlobalCycle = globalCycle; //Settear al final para tener los ciclos totales de la simulación
+    }
+    
+    public int getTotalGlobalCycle (){
+        return totalGlobalCycle;
+    }
+    
     public void reset() {
         this.readyQueue.clear(); 
         this.blockedQueue.clear();
@@ -66,6 +76,7 @@ public class Simulator {
             processors[i].reset(); 
         }
         this.globalCycle = 0;
+        this.totalGlobalCycle = 0;
         this.schedulingPolicy = null; 
     }
     
@@ -108,6 +119,36 @@ public class Simulator {
     
     // Adaptar el método executeCycle para implementar Round Robin
     public void executeCycle() {
+       //Simulacion Finalizada
+       if (readyQueue.isEmpty() && blockedQueue.isEmpty() && finishedQueue.size() == generalQueue.size()) {
+       mainView.GlobalClockSimulationLabel.setText("Global Clock Cycle Number: 0");
+       mainView.timer.stop();  
+       mainView.isSimulationActive = false;  
+       mainView.isSimulationFinished = true;
+       setTotalGlobalCycle();
+       JOptionPane.showMessageDialog(mainView, "Simulation is Over!", "Done", JOptionPane.INFORMATION_MESSAGE);
+       updateIndividualCPUTable();
+       double executionTotalTime = getExecutionTotalTime(getTotalGlobalCycle(), getCycleDuration());
+       mainView.totalExecutionTimeLabel.setText(Double.toString(executionTotalTime) + " s");
+       mainView.totalClockCyclesLabel.setText(getTotalGlobalCycle() + " cycles");
+        int finishedCount = getFinishedQueue().size(); 
+        int generalCount = getGeneralQueue().size(); 
+        if (generalCount == 0) {
+            mainView.completionRateLabel.setText("0.0%"); 
+        } else {
+            double completionRate = ((double) finishedCount / generalCount) * 100; 
+            mainView.completionRateLabel.setText(String.format("%.2f%%", completionRate)); 
+        } 
+        
+       mainView.MetricPlanningPolicyLabel.setText(getSchedulingPolicy().toString());
+       mainView.nProcessorsLabel.setText(getNumProcessors() + " processors");
+       mainView.processesFinishedLabel.setText(getFinishedQueue().size() + " processes");
+       mainView.processesEnteredLabel.setText(getGeneralQueue().size() + " processes");
+       mainView.updatePanelVisibility(mainView.isSimulationFinished);
+       mainView.StartSimulationButton.setText("Reset Simulator");
+       mainView.StartSimulationButton.setBackground(Color.YELLOW);
+       mainView.StartSimulationButton.setForeground(Color.BLACK);
+    }
     globalCycle++;
     
         // Asignar procesos a los procesadores ociosos
@@ -323,6 +364,10 @@ public class Simulator {
         schedulingPolicy = newPolicy; 
     }
     
+    public SchedulingPolicy getSchedulingPolicy() {
+        return schedulingPolicy;
+    }
+    
      public void setReadyQueue(ProcessQueue newQueue) {
         readyQueue = newQueue; 
     }
@@ -344,7 +389,32 @@ public class Simulator {
         return cycleDuration;
     }
     
-    public void setCycleDuration (int cycleDuration){
-        cycleDuration = cycleDuration;
+    public void setCycleDuration (int cycleDurationTime){
+        cycleDuration = cycleDurationTime;
+    }
+    
+    
+    public void updateIndividualCPUTable() {
+        DefaultTableModel model = (DefaultTableModel) mainView.IndividualCPUTable.getModel();
+        model.setRowCount(0); 
+        for (Processor processor : processors) {
+            String name = "Processor " + (processor.getId() + 1);  // Nombre del procesador
+            long totalTime = processor.getTotalTimeUsed() / 1000;
+            String totalTimeUsed = totalTime+ " s";
+            double cpuUtilization = processor.calculateCpuUtilization(getTotalGlobalCycle(), getCycleDuration()); // Utilización de CPU
+            DecimalFormat df = new DecimalFormat("#.00");
+            String cpuUtilizationString = df.format(cpuUtilization) + "%";
+            int handledProcesses = processor.getHandledProcessesCount(); 
+            String processes = processor.getProcessesAsString(); 
+            System.out.println(processes);
+            model.addRow(new Object[] { name, totalTimeUsed, cpuUtilizationString, handledProcesses, processes });
+        }
+        mainView.IndividualCPUTable.repaint();
+    }
+    
+    
+     public double getExecutionTotalTime(int totalGlobalCycle, int cycleDuration) {
+        int executionTotalTime = (totalGlobalCycle * cycleDuration) / 1000;
+        return executionTotalTime; 
     }
 }

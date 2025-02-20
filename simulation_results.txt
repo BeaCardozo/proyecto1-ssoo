@@ -1,10 +1,8 @@
 #Simulation Data
 #PROCESS
-3337, Proceso 1, 20, true, 1, 1, 1, 0, READY
-5049, Proceso 2, 5, true, 1, 1, 1, 0, READY
-8106, Proceso 3, 10, true, 1, 1, 1, 0, READY
+9177, hola, 5, true, 1, 1, 1, 0, READY
 
 #CONFIG
 Cycle Duration: 1
 Number of Active Processors: 2
-Planning Policy: SPN - Shortest Process Next
+Planning Policy: FCFS - First-Come, First-Served
