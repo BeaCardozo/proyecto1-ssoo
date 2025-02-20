@@ -709,8 +709,6 @@ public class MainView extends javax.swing.JFrame {
         // Crear el proceso
         Process process = new Process(name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle, simulator); //id se asigna automatico
         simulator.getReadyQueue().add(process);
-        // Agregar el proceso al simulador
- //       ProcessQueue readyQueue = new ProcessQueue(3);
         simulator.addProcess(process);
 
         DefaultTableModel modelo = (DefaultTableModel) ProcessTable.getModel();
@@ -777,8 +775,7 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_LoadTXTButtonActionPerformed
     
     
-    //FUNCIONES
-    
+    //FUNCIONES 
     // Actualizar la tabla de procesos listos
     public void updateInterface() {
         DefaultTableModel modeloListos = (DefaultTableModel) ProcessTable.getModel();
@@ -793,7 +790,6 @@ public class MainView extends javax.swing.JFrame {
             new MainView().setVisible(true);
         });
     }
-    
     
     //Paneles deshabilitados antes de la simulación
     public void enablePanels(boolean value) {
@@ -891,95 +887,87 @@ public class MainView extends javax.swing.JFrame {
     
     //Mostrar o actualizar PCBs
     public void updatePCBSandQueues() {
-    // Clasificar los procesos en las colas correspondientes
-    simulator.classifyProcesses();
-    // Crear nuevos modelos para las listas de la interfaz
-    DefaultListModel<String> readyListModel = new DefaultListModel<>();
-    DefaultListModel<String> blockedListModel = new DefaultListModel<>();
-    DefaultListModel<String> finishedListModel = new DefaultListModel<>();
+        // Clasificar los procesos en las colas correspondientes
+        simulator.classifyProcesses();
+        // Crear nuevos modelos para las listas de la interfaz
+        DefaultListModel<String> readyListModel = new DefaultListModel<>();
+        DefaultListModel<String> blockedListModel = new DefaultListModel<>();
+        DefaultListModel<String> finishedListModel = new DefaultListModel<>();
 
-    // Obtener los nombres de los procesos en cada cola y agregarlos a los modelos
-    for (int i = 0; i < simulator.getReadyQueue().size(); i++) {
-        Process process = simulator.getReadyQueue().get(i);
-        readyListModel.addElement(process.getName());
-    }
-
-    for (int i = 0; i < simulator.getBlockedQueue().size(); i++) {
-        Process process = simulator.getBlockedQueue().get(i);
-        blockedListModel.addElement(process.getName());
-    }
-
-    for (int i = 0; i < simulator.getFinishedQueue().size(); i++) {
-        Process process = simulator.getFinishedQueue().get(i);
-        finishedListModel.addElement(process.getName());
-    }
-
-    // Asignar los nuevos modelos a las listas de la interfaz
-    ReadyQueueList.setModel(readyListModel);
-    BlockedQueueList.setModel(blockedListModel);
-    FinishedQueueList.setModel(finishedListModel);
-
-    // Actualizar los PCBs en la interfaz gráfica
-    PCBMainPanel.removeAll();
-    ProcessQueue allProcess = simulator.getGeneralQueue();
-    if (allProcess.size() > 0) {
-        for (int i = 0; i < allProcess.size(); i++) {
-            Process process = allProcess.get(i);
-            if (process != null) {
-                ProcessPCB processPanel = new ProcessPCB(process);
-                PCBMainPanel.add(processPanel);
-            }
+        // Obtener los nombres de los procesos en cada cola y agregarlos a los modelos
+        for (int i = 0; i < simulator.getReadyQueue().size(); i++) {
+            Process process = simulator.getReadyQueue().get(i);
+            readyListModel.addElement(process.getName());
         }
+
+        for (int i = 0; i < simulator.getBlockedQueue().size(); i++) {
+            Process process = simulator.getBlockedQueue().get(i);
+            blockedListModel.addElement(process.getName());
+        }
+
+        for (int i = 0; i < simulator.getFinishedQueue().size(); i++) {
+            Process process = simulator.getFinishedQueue().get(i);
+            finishedListModel.addElement(process.getName());
+        }
+
+        // Asignar los nuevos modelos a las listas de la interfaz
+        ReadyQueueList.setModel(readyListModel);
+        BlockedQueueList.setModel(blockedListModel);
+        FinishedQueueList.setModel(finishedListModel);
+
+        // Actualizar los PCBs en la interfaz gráfica
+        PCBMainPanel.removeAll();
+        ProcessQueue allProcess = simulator.getGeneralQueue();
+        if (allProcess.size() > 0) {
+            for (int i = 0; i < allProcess.size(); i++) {
+                Process process = allProcess.get(i);
+                if (process != null) {
+                    ProcessPCB processPanel = new ProcessPCB(process);
+                    PCBMainPanel.add(processPanel);
+                }
+            }   
+        }
+        PCBMainPanel.revalidate();
+        PCBMainPanel.repaint();
     }
-    PCBMainPanel.revalidate();
-    PCBMainPanel.repaint();
-}
 
     //Txt config
     private void saveToFile() {
-    String filename = System.getProperty("user.dir") + "/simulation_results.txt";
-    try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
-        writer.write("#Simulation Data");
-        writer.newLine();
-
-        writer.write("#PROCESS");
-        writer.newLine();
-
-        simulator.getGeneralQueue().iterateProcesses(writer);
-
-        writer.newLine();
-        writer.write("#CONFIG");
-        writer.newLine();
-
-        writer.write("Cycle Duration: " + CycleDurationTextField.getText().trim());
-        writer.newLine();
-        writer.write("Number of Active Processors: " + 
+        String filename = System.getProperty("user.dir") + "/simulation_results.txt";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            writer.write("#Simulation Data");
+            writer.newLine();
+            writer.write("#PROCESS");
+            writer.newLine();
+            simulator.getGeneralQueue().iterateProcesses(writer);
+            writer.newLine();
+            writer.write("#CONFIG");
+            writer.newLine();
+            writer.write("Cycle Duration: " + CycleDurationTextField.getText().trim());
+            writer.newLine();
+            writer.write("Number of Active Processors: " + 
                      (TwoProcessorsOption.isSelected() ? "2" : "3"));
-        writer.newLine();
-        writer.write("Planning Policy: " + SchedulingPolicyComboBox.getSelectedItem());
-        writer.newLine();
-
-        JOptionPane.showMessageDialog(null, "Your simulation data has been saved in " + filename);
-    } catch (IOException ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(null, "Error! Data not saved!");
-    }
-    }
-    
-    private static void selectRadioButton(String option, ButtonGroup buttonGroup) {
-        // Obtener la enumeración de los botones en el ButtonGroup
-        Enumeration<AbstractButton> buttons = buttonGroup.getElements();
-        
-        // Iterar sobre los botones
-        while (buttons.hasMoreElements()) {
-            AbstractButton button = buttons.nextElement(); // Obtener el botón
-            if (button.getText().equals(option)) {
-                button.setSelected(true); // Seleccionar el botón correspondiente
-                break; // Salir si encontramos la opción
-            }
+            writer.newLine();
+            writer.write("Planning Policy: " + SchedulingPolicyComboBox.getSelectedItem());
+            writer.newLine();
+            JOptionPane.showMessageDialog(null, "Your simulation data has been saved in " + filename);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error! Data not saved!");
         }
     }
     
+    //Para poner valor de numero de procesadores al leer TXT
+    private static void selectRadioButton(String option, ButtonGroup buttonGroup) {
+        Enumeration<AbstractButton> buttons = buttonGroup.getElements();
+        while (buttons.hasMoreElements()) {
+            AbstractButton button = buttons.nextElement(); 
+            if (button.getText().equals(option)) {
+                button.setSelected(true); 
+                break; 
+            }
+        }
+    }
     
     //LEER TXT
     private void loadTxtFile() {
@@ -988,116 +976,90 @@ public class MainView extends javax.swing.JFrame {
 
         if (option == JFileChooser.APPROVE_OPTION) {
             String filePath = fileChooser.getSelectedFile().getAbsolutePath();
-        Process process = null;
-
-        // Variables para la sección de configuración
-        String cycleDuration = "";
-        String numberOfActiveProcessors = "";
-        String planningPolicy = "";
+            Process process = null;
+            String cycleDuration = "";
+            String numberOfActiveProcessors = "";
+            String planningPolicy = "";
             try {
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
-
-            String line;
-            boolean isProcessSection = false;
-            boolean isConfigSection = false;
-
-
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("#PROCESS")) {
-                    isProcessSection = true;
-                    isConfigSection = false; 
-                    continue;
-                } else if (line.startsWith("#CONFIG")) {
-                    isConfigSection = true;
-                    isProcessSection = false; 
-                    continue;
-                }
-
-                // Almacenar datos de procesos
-                if (isProcessSection) {
-                    String[] processData = line.split(","); 
-                    System.out.println("Leyendo línea de procesos: " + line); 
-
-                    if (processData.length >= 8) { 
-                        try {
-                            String name = processData[1].trim();
-                            int numberOfInstructions = Integer.parseInt(processData[2].trim());
-                            boolean isCpuBound = Boolean.parseBoolean(processData[3].trim());
-                            int exceptionCycle = Integer.parseInt(processData[4].trim());
-                            int satisfactionCycle = Integer.parseInt(processData[5].trim());
-
-                            // Crear el objeto Process 
-                            process = new Process(name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle, simulator);
-                            simulator.getGeneralQueue().add(process);
-                            
-                        } catch (NumberFormatException e) {
-                            System.out.println("Error al procesar la línea del proceso: " + line);
-                            e.printStackTrace();
-                        }
-                    } else {
-                        System.out.println("La línea no tiene la cantidad esperada de datos: " + line);
+                BufferedReader reader = new BufferedReader(new FileReader(filePath));
+                String line;
+                boolean isProcessSection = false;
+                boolean isConfigSection = false;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("#PROCESS")) {
+                        isProcessSection = true;
+                        isConfigSection = false; 
+                        continue;
+                    } else if (line.startsWith("#CONFIG")) {
+                        isConfigSection = true;
+                        isProcessSection = false; 
+                        continue;
                     }
-                }
+                
+                    if (isProcessSection) {
+                        String[] processData = line.split(","); 
+                        System.out.println("Leyendo línea de procesos: " + line); 
+                        if (processData.length >= 8) { 
+                            try {
+                                String name = processData[1].trim();
+                                int numberOfInstructions = Integer.parseInt(processData[2].trim());
+                                boolean isCpuBound = Boolean.parseBoolean(processData[3].trim());
+                                int exceptionCycle = Integer.parseInt(processData[4].trim());
+                                int satisfactionCycle = Integer.parseInt(processData[5].trim());
 
-                // Almacenar datos de configuración
-                if (isConfigSection) {
-                    String[] configParts = line.split(":");
-                    if (configParts.length == 2) {
-                        switch (configParts[0].trim()) {
-                            case "Cycle Duration":
-                                cycleDuration = configParts[1].trim();
-                                simulator.setCycleDuration(Integer.parseInt(cycleDuration));
-                                CycleDurationTextField.setText(cycleDuration);
-                                break;
-                            case "Number of Active Processors":
-                                numberOfActiveProcessors = configParts[1].trim();
-                                selectRadioButton(numberOfActiveProcessors, ActiveProcessorsGroup);
-                                simulator.setNumProcessors(Integer.parseInt(numberOfActiveProcessors));
-                                
-                                break;
-                            case "Planning Policy":
-                                planningPolicy = configParts[1].trim();
-                                simulator.setSchedulingPolicy(SchedulingPolicy.fromString(planningPolicy));
-                                SchedulingPolicyComboBox.setSelectedItem(planningPolicy);
-                                break;
+                                process = new Process(name, numberOfInstructions, isCpuBound, exceptionCycle, satisfactionCycle, simulator);
+                                simulator.getGeneralQueue().add(process);
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                            System.out.println("La línea no tiene la cantidad esperada de datos: " + line);
                         }
                     }
-                    
-         
+
+                    if (isConfigSection) {
+                        String[] configParts = line.split(":");
+                        if (configParts.length == 2) {
+                            switch (configParts[0].trim()) {
+                                case "Cycle Duration":
+                                    cycleDuration = configParts[1].trim();
+                                    simulator.setCycleDuration(Integer.parseInt(cycleDuration));
+                                    CycleDurationTextField.setText(cycleDuration);
+                                    break;
+                                case "Number of Active Processors":
+                                    numberOfActiveProcessors = configParts[1].trim();
+                                    selectRadioButton(numberOfActiveProcessors, ActiveProcessorsGroup);
+                                    simulator.setNumProcessors(Integer.parseInt(numberOfActiveProcessors));
+                                    break;
+                                case "Planning Policy":
+                                    planningPolicy = configParts[1].trim();
+                                    simulator.setSchedulingPolicy(SchedulingPolicy.fromString(planningPolicy));
+                                    SchedulingPolicyComboBox.setSelectedItem(planningPolicy);
+                                    break;
+                            }
+                        }
+                    }
                 }
+                reader.close();
+                //DEBUG
+                if (process != null) {
+                    System.out.println("Proceso creado:");
+                    System.out.println("Nombre: " + process.getName());
+                    System.out.println("Número de Instrucciones: " + process.getInstructions());
+                    System.out.println("Es CPU Bound: " + process.isCpuBound());
+                    System.out.println("Ciclo de Excepción: " + process.getExceptionCycles());
+                    System.out.println("Ciclo de Satisfacción: " + process.getSatisfactionCycles());
+                } 
+                System.out.println("\nConfiguración:");
+                System.out.println("Duración del Ciclo: " + cycleDuration);
+                System.out.println("Número de Procesadores Activos: " + numberOfActiveProcessors);
+                System.out.println("Política de Planificación: " + planningPolicy);
+                updateInterface();
+                updateButtonStates();
+            } catch (IOException e) {
+                e.printStackTrace(); // Manejo de excepciones
             }
-
-            reader.close();
-
-            // Mostrar la información del objeto process
-            if (process != null) {
-                System.out.println("Proceso creado:");
-                System.out.println("Nombre: " + process.getName());
-                System.out.println("Número de Instrucciones: " + process.getInstructions());
-                System.out.println("Es CPU Bound: " + process.isCpuBound());
-                System.out.println("Ciclo de Excepción: " + process.getExceptionCycles());
-                System.out.println("Ciclo de Satisfacción: " + process.getSatisfactionCycles());
-            } else {
-                 System.out.println("procesos es null");
-            }
-
-            // Mostrar la información de la configuración
-            System.out.println("\nConfiguración:");
-            System.out.println("Duración del Ciclo: " + cycleDuration);
-            System.out.println("Número de Procesadores Activos: " + numberOfActiveProcessors);
-            System.out.println("Política de Planificación: " + planningPolicy);
-            
-            
-            updateInterface();
-            updateButtonStates();
-
-        } catch (IOException e) {
-            e.printStackTrace(); // Manejo de excepciones
         }
-    
-        }
-        
-        
     }
     
 
