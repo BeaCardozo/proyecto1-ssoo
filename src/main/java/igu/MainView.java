@@ -627,9 +627,9 @@ public class MainView extends javax.swing.JFrame {
             simulator.setNumProcessors(numProcessors); 
             String selectedItem = SchedulingPolicyComboBox.getSelectedItem().toString();
             if (selectedItem != null) {
-                 SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
-                simulator.setSchedulingPolicy(policy);
-               // simulator.classifyProcesses();
+               SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
+               simulator.setSchedulingPolicy(policy);
+               simulator.classifyProcesses();
                //simulator.reorderAndSetReadyQueue();
             } else {
                 System.out.println("No se ha seleccionado ninguna política.");
@@ -867,7 +867,6 @@ public class MainView extends javax.swing.JFrame {
     public void updatePCBSandQueues() {
     // Clasificar los procesos en las colas correspondientes
     simulator.classifyProcesses();
-
     // Crear nuevos modelos para las listas de la interfaz
     DefaultListModel<String> readyListModel = new DefaultListModel<>();
     DefaultListModel<String> blockedListModel = new DefaultListModel<>();

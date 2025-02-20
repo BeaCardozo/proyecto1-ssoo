@@ -88,7 +88,7 @@ public class Simulator {
         switch (process.getState()) {
             case"READY":
                 if (!readyQueue.contains(process)) {
-                    readyQueue.add(process); // Agregar a la cola de listos si no está ya
+                    readyQueue.add(process);
                     blockedQueue.remove(process);
                 }
                 break;
@@ -149,23 +149,22 @@ public class Simulator {
        mainView.StartSimulationButton.setBackground(Color.YELLOW);
        mainView.StartSimulationButton.setForeground(Color.BLACK);
     }
-    globalCycle++;
+        globalCycle++;
     
         // Asignar procesos a los procesadores ociosos
     for (int i =0;i<processors.length; i++) {
         if (processors[i].isIdle()&&!readyQueue.isEmpty()) {
-            Process process = readyQueue.remove(); // Eliminar de la cola de listos
-            processors[i].assignProcess(process); // Asignar al procesador
+            Process process = readyQueue.remove();
+            processors[i].assignProcess(process); 
         }
     }
     
     for (int i=0;i<processors.length;i++) {
         if (!processors[i].isIdle()) {
             Process process = processors[i].getCurrentProcess();
-            // Verificar si el proceso ha terminado
             if (process.hasFinished()) {
                 processors[i].releaseProcessor(); // Liberar el procesador
-                process.setState("FINISHED");  
+                process.setState("FINISHED"); 
                 break;
             }
             else if (process.isBlocked() && processors[i].cycles_blocked != process.getSatisfactionCycles()&&!("READY").equals(process.getState())){ 
@@ -173,8 +172,8 @@ public class Simulator {
                 processors[i].cycles_blocked++;
                 MainView.ExecutionModeLabel.setForeground(Color.RED);
                 MainView.ExecutionModeLabel.setText("Operative System");
-            }else if(process.isBlocked() && processors[i].cycles_blocked ==process.getSatisfactionCycles()){
-                processors[i].cycles_blocked =0;
+            }else if(process.isBlocked() && processors[i].cycles_blocked == process.getSatisfactionCycles()){
+                processors[i].cycles_blocked = 0;
                 process.setState("READY");
                 processors[i].releaseProcessor();
                 break;
@@ -185,7 +184,6 @@ public class Simulator {
                 if (process.getMAR() < process.getInstructions()) {
                     process.incrementProgramCounter();
                 } 
-                // Set remaining instructions
                 int remaining = process.getInstructions() - process.getMAR();
                 process.setRemainingInstructions(remaining);
             }                      
@@ -222,26 +220,37 @@ public class Simulator {
     //--------------- IDEA DE FUNCIONES DE PLANIFICACIÓN ----------------------//
     //SPN (Shortest Process Next)
     public ProcessQueue reorderBySPN() {
-        int queueSize = readyQueue.size(); 
-        ProcessQueue sortedQueue = new ProcessQueue(queueSize); 
-        Process[] processes = new Process[queueSize];
-        for (int i = 0; i < queueSize; i++) {
-            processes[i] = readyQueue.get(i); 
-        }
-        for (int i = 0; i < queueSize - 1; i++) {
-            for (int j = 0; j < queueSize - 1 - i; j++) {
-                if (processes[j].getInstructions() > processes[j + 1].getInstructions()) {
-                    Process tmp = processes[j];
-                    processes[j] = processes[j + 1];
-                    processes[j + 1] = tmp;
-                }
+    System.out.println("Reordenando...");
+
+    int queueSize = readyQueue.size();
+    ProcessQueue sortedQueue = new ProcessQueue(queueSize);
+    Process[] processes = new Process[queueSize];
+
+    // Cargar los procesos desde la cola lista
+    for (int i = 0; i < queueSize; i++) {
+        processes[i] = readyQueue.get(i);
+    }
+
+    // Implementar el ordenamiento (sorting)
+    for (int i = 0; i < queueSize - 1; i++) {
+        for (int j = 0; j < queueSize - 1 - i; j++) {
+            // Comparar el número de instrucciones
+            if (processes[j].getInstructions() > processes[j + 1].getInstructions()) {
+                // Intercambiar si están en el orden incorrecto
+                Process tmp = processes[j];
+                processes[j] = processes[j + 1];
+                processes[j + 1] = tmp;
             }
         }
-        for (Process p : processes) {
-            sortedQueue.add(p); 
-        }
-        return sortedQueue; 
     }
+
+    // Mover los procesos ordenados a la cola ordenada
+    for (Process p : processes) {
+        sortedQueue.add(p);
+    }
+    
+    return sortedQueue;
+}
     
     //SRT (Shortest Remaining Time)
     public ProcessQueue reorderBySRT() {
