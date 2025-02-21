@@ -242,9 +242,7 @@ public class Simulator {
         }
  
     }
-    
-    
-  
+
     private void assignProcesses() {
         for (Processor processor : processors) {
             if (processor.isIdle() && !readyQueue.isEmpty()) {
@@ -297,7 +295,7 @@ public class Simulator {
         if (selectedProcess != null) {
             readyQueue.remove(selectedProcess);
         }
-        return selectedProcess; // Retorna el proceso seleccionado o null si no se encontró
+        return selectedProcess; 
     }
 
 
@@ -320,21 +318,12 @@ public class Simulator {
         }
     }
         if (selectedProcess != null) {
-            /*for (int j = readyQueue.getFront(); j <= readyQueue.getEnd(); j++) {
-                if (readyQueue.getProcesses()[j] == selectedProcess) {
-                    for (int k = j; k < readyQueue.getEnd(); k++) {
-                        readyQueue.getProcesses()[k] = readyQueue.getProcesses()[k + 1];
-                    }   
-                    readyQueue.decreaseEnd(); // Actualiza el final de la cola
-                    break;
-                }
-            }*/
             readyQueue.remove(selectedProcess);
         }
-        return selectedProcess; // Retorna el proceso seleccionado o null si no se encontró
+        return selectedProcess; 
     }
       
-     //Llenar tabla de procesos:
+    //Llenar tabla de procesos:
     public DefaultTableModel updateProcessTable() {
         DefaultTableModel model = new DefaultTableModel();
         for (int i = 0; i < numProcessors; i++) {
@@ -402,6 +391,28 @@ public class Simulator {
         }
         mainView.IndividualCPUTable.repaint();
     }
+    
+    //Para tomar los datos y convertirloes en [][]Object para la grafica
+    public Object[][] getProcessorData() {
+        int numberOfProcessors = processors.length;
+        Object[][] newValues = new Object[numberOfProcessors * 2][3]; 
+        int index = 0;
+        for (Processor processor : processors) {
+            String name = "Processor " + (processor.getId() + 1);
+            long totalTime = processor.getTotalTimeUsed() / 1000; 
+            double cpuUtilization = processor.calculateCpuUtilization(getTotalGlobalCycle(), getCycleDuration());
+            newValues[index][0] = totalTime; 
+            newValues[index][1] = "Total Time Used (s)"; 
+            newValues[index][2] = name; 
+            index++;
+            newValues[index][0] = cpuUtilization; 
+            newValues[index][1] = "CPU Utilization (%)"; 
+            newValues[index][2] = name; 
+            index++;
+        }
+        return newValues;
+    }
+
     
     
     public double getExecutionTotalTime(int totalGlobalCycle, int cycleDuration) {

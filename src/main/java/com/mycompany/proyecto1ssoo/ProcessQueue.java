@@ -62,16 +62,15 @@ public class ProcessQueue {
     public boolean remove(Process processToRemove) {
     for (int i = front; i <= end; i++) {
         if (processes[i].equals(processToRemove)) {
-            // Mover los elementos restantes una posición hacia la izquierda
             for (int j = i; j < end; j++) {
                 processes[j] = processes[j + 1];
             }
-            processes[end] = null; // Eliminar la referencia al último elemento
-            end--; // Reducir el tamaño de la cola
-            return true; // Proceso eliminado
+            processes[end] = null; 
+            end--; 
+            return true; 
         }
     }
-    return false; // Proceso no encontrado
+    return false; 
 }
     
     public boolean containsName(String name) {
@@ -108,10 +107,10 @@ public class ProcessQueue {
     public boolean contains(Process processToFind) {
     for (int i = front; i <= end; i++) {
         if (processes[i].equals(processToFind)) {
-            return true; // El proceso está en la cola
+            return true; 
         }
     }
-    return false; // El proceso no está en la cola
+    return false; 
 }
     
    public DefaultListModel<String> getProcessNames() {

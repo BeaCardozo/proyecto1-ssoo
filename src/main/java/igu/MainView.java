@@ -123,7 +123,8 @@ public class MainView extends javax.swing.JFrame {
         CPUMetricsPanel = new javax.swing.JPanel();
         jScrollPane3 = new javax.swing.JScrollPane();
         IndividualCPUTable = new javax.swing.JTable();
-        LoadTXTButton1 = new javax.swing.JButton();
+        SeeProcessorsGraph = new javax.swing.JButton();
+        SeeSystemGraph = new javax.swing.JButton();
         SimulationDetailsPanel = new javax.swing.JPanel();
         DetailsPanel = new javax.swing.JPanel();
         ExecutionModeLabel = new javax.swing.JLabel();
@@ -146,7 +147,6 @@ public class MainView extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMaximumSize(new java.awt.Dimension(1300, 725));
         setMinimumSize(new java.awt.Dimension(1300, 725));
         setResizable(false);
         setSize(new java.awt.Dimension(1300, 725));
@@ -478,18 +478,31 @@ public class MainView extends javax.swing.JFrame {
 
         CPUMetricsPanel.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 590, 90));
 
-        LoadTXTButton1.setBackground(new java.awt.Color(153, 51, 255));
-        LoadTXTButton1.setFont(new java.awt.Font("Geeza Pro", 1, 12)); // NOI18N
-        LoadTXTButton1.setForeground(new java.awt.Color(255, 255, 255));
-        LoadTXTButton1.setText("See Graph");
-        LoadTXTButton1.setBorderPainted(false);
-        LoadTXTButton1.setOpaque(true);
-        LoadTXTButton1.addActionListener(new java.awt.event.ActionListener() {
+        SeeProcessorsGraph.setBackground(new java.awt.Color(153, 51, 255));
+        SeeProcessorsGraph.setFont(new java.awt.Font("Geeza Pro", 1, 12)); // NOI18N
+        SeeProcessorsGraph.setForeground(new java.awt.Color(255, 255, 255));
+        SeeProcessorsGraph.setText("Processor Metrics Chart");
+        SeeProcessorsGraph.setBorderPainted(false);
+        SeeProcessorsGraph.setOpaque(true);
+        SeeProcessorsGraph.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                LoadTXTButton1ActionPerformed(evt);
+                SeeProcessorsGraphActionPerformed(evt);
             }
         });
-        CPUMetricsPanel.add(LoadTXTButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 120, 150, 40));
+        CPUMetricsPanel.add(SeeProcessorsGraph, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 120, 260, 40));
+
+        SeeSystemGraph.setBackground(new java.awt.Color(0, 153, 0));
+        SeeSystemGraph.setFont(new java.awt.Font("Geeza Pro", 1, 12)); // NOI18N
+        SeeSystemGraph.setForeground(new java.awt.Color(255, 255, 255));
+        SeeSystemGraph.setText("System Metrics Chart");
+        SeeSystemGraph.setBorderPainted(false);
+        SeeSystemGraph.setOpaque(true);
+        SeeSystemGraph.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SeeSystemGraphActionPerformed(evt);
+            }
+        });
+        CPUMetricsPanel.add(SeeSystemGraph, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 120, 260, 40));
 
         SystemPerfomanceMetricsPanel.add(CPUMetricsPanel, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 20, 610, 170));
 
@@ -613,7 +626,6 @@ public class MainView extends javax.swing.JFrame {
             isSimulationFinished = false;
             stopSimulation();
             ModifySpecificationsButton.setVisible(isSimulationActive);
-            //Reestablecer estilos del boton
             StartSimulationButton.setText("Start Simulation");
             StartSimulationButton.setBackground(new Color(181,241,169));
             StartSimulationButton.setForeground(Color.BLACK);
@@ -788,9 +800,25 @@ public class MainView extends javax.swing.JFrame {
         loadTxtFile();
     }//GEN-LAST:event_LoadTXTButtonActionPerformed
 
-    private void LoadTXTButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadTXTButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_LoadTXTButton1ActionPerformed
+    private void SeeProcessorsGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeeProcessorsGraphActionPerformed
+        ProcessorMetricChart chartFrame = new ProcessorMetricChart("Processor Metrics Chart");
+        chartFrame.setSize(900, 700);
+        chartFrame.setVisible(true);
+        chartFrame.loadNewDataset(simulator.getProcessorData());  
+    }//GEN-LAST:event_SeeProcessorsGraphActionPerformed
+
+    private void SeeSystemGraphActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeeSystemGraphActionPerformed
+        SystemPerformanceMetricsChart chartFrame = new SystemPerformanceMetricsChart("System Metrics Chart");
+        chartFrame.setSize(900, 700);
+        chartFrame.setVisible(true);
+        Object[][] newValues = {
+            {(double)simulator.getExecutionTotalTime(simulator.getTotalGlobalCycle(), simulator.getCycleDuration()), "Total Execution (s)", "Métrica"},
+            {(double)simulator.getTotalGlobalCycle(), "Total Clock Cycles", "Métrica"},
+            {(double) simulator.getFinishedQueue().size() / simulator.getGeneralQueue().size() * 100, "Completion Rate (%)", "Métrica"}           
+    };
+        
+        chartFrame.loadNewDataset(newValues);
+    }//GEN-LAST:event_SeeSystemGraphActionPerformed
     
     
     //FUNCIONES 
@@ -1123,7 +1151,6 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JPanel IOBoundPanel;
     public javax.swing.JTable IndividualCPUTable;
     public javax.swing.JButton LoadTXTButton;
-    public javax.swing.JButton LoadTXTButton1;
     public javax.swing.JLabel MetricPlanningPolicyLabel;
     private javax.swing.JLabel ModeLabel;
     private javax.swing.JButton ModifySpecificationsButton;
@@ -1142,6 +1169,8 @@ public class MainView extends javax.swing.JFrame {
     private javax.swing.JLabel ReadyQueueLabel;
     private javax.swing.JList ReadyQueueList;
     private javax.swing.JComboBox<String> SchedulingPolicyComboBox;
+    public javax.swing.JButton SeeProcessorsGraph;
+    public javax.swing.JButton SeeSystemGraph;
     private javax.swing.JPanel SimulationDetailsPanel;
     private javax.swing.JPanel SimulationPanel;
     public javax.swing.JButton StartSimulationButton;

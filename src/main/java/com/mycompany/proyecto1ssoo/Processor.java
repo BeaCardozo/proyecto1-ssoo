@@ -47,18 +47,14 @@ public class Processor {
             Thread processThread = new Thread(process);
             processThread.start();
             String processName = process.getName();
-            // Comprobar si el nombre del proceso ya está registrado
             if (!isProcessNameRegistered(processName)) {
                 if (processIndex < handledProcessNames.length) {
-                    handledProcessNames[processIndex++] = processName; // Agregar el proceso
+                    handledProcessNames[processIndex++] = processName;
                     handledProcessesCount++;
-                    System.out.println("Añadido: " + processName);
                 } else {
                     System.out.println("Limite alcanzado, no se puede añadir más procesos.");
                 }
-            } else {
-                System.out.println("El proceso " + processName + " ya está registrado.");
-            }
+            } else { }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -73,9 +69,6 @@ public class Processor {
             this.isIdle = true;
         }
     }
-    
-    
-    
     
     public void reset() {
         this.currentProcess = null;
