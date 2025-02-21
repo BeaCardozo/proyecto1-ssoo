@@ -15,7 +15,7 @@ public class Simulator {
     private ProcessQueue finishedQueue;
     private ProcessQueue generalQueue;
     public Processor[] processors;
-    private int globalCycle;
+    private int globalCycle; 
     private int totalGlobalCycle;
     private SchedulingPolicy schedulingPolicy;
     private int numProcessors; 
@@ -56,14 +56,47 @@ public class Simulator {
     }
     
     public void adjustListSize(int n) {
-        if (n < 3) {
-            Processor[] newProcessors = new Processor[n]; 
-            for (int i = 0; i < n; i++) {
+    if (n <= 3) {
+        Processor[] newProcessors = new Processor[n];
+        for (int i = 0; i < n; i++) {
+            if (i < processors.length) {
+                if(processors[processors.length-1].getCurrentProcess()!=null){
+                    processors[processors.length-1].getCurrentProcess().setState("READY");
+                }
                 newProcessors[i] = processors[i];
+            } else {
+                newProcessors[i] = new Processor(i);
             }
-            processors = newProcessors;
-        } 
+        }
+        processors = newProcessors;
     }
+}
+    
+    
+    
+//    public void changeProcessorsQuantity(int n){
+//        int actualQuantity = processors.length;
+//        System.out.println("Cantidad de procesadores: "+actualQuantity);
+//        System.out.println("Nueva cantidad: "+n);
+//        if(actualQuantity!=n){
+//            if(n==3){
+//                //agregar un procesador
+//               this.processors.remove(this.processors.length);
+//                
+//            }else{
+//                //eliminar un procesador
+//            }
+//        }
+//    }
+    
+            // Asignar procesos a los procesadores ociosos
+        
+        /*for (int n =0;n<processors.length; n++) {
+            if (processors[n].isIdle()&&!readyQueue.isEmpty()) {
+                Process process = readyQueue.remove();
+                processors[n].assignProcess(process); 
+            }
+        }*/
 
     public void addProcess(Process process) {
         generalQueue.add(process);
@@ -161,13 +194,6 @@ public class Simulator {
         globalCycle++;
         int quantum = 5; 
 
-        // Asignar procesos a los procesadores ociosos
-        /*for (int n =0;n<processors.length; n++) {
-            if (processors[n].isIdle()&&!readyQueue.isEmpty()) {
-                Process process = readyQueue.remove();
-                processors[n].assignProcess(process); 
-            }
-        }*/
         
         for (int i = 0; i < processors.length; i++) {
             if (processors[i].isIdle() && !readyQueue.isEmpty()) {
@@ -178,10 +204,10 @@ public class Simulator {
                 } else if (schedulingPolicy == SchedulingPolicy.SRT) { 
                     System.out.println("Se está usando la política de SRT.");
                     process = getShortestRemainingTimeProcess(readyQueue);
-                } else if (schedulingPolicy == SchedulingPolicy.FCFS) {
-                    System.out.println("Se está usando la política de FCFS.");
-                    process = getProcessFCFS(readyQueue);
-                } 
+                }// else if (schedulingPolicy == SchedulingPolicy.FCFS) {
+//                    System.out.println("Se está usando la política de FCFS.");
+//                    process = getProcessFCFS(readyQueue);
+//                } 
                 else if (schedulingPolicy == SchedulingPolicy.HRRN) {
                     System.out.println("Se está usando la política de HRRN.");
                     process = getProcessHRRN(readyQueue, globalCycle);
@@ -283,20 +309,21 @@ public class Simulator {
     
     
     //FCFS
-    private Process getProcessFCFS(ProcessQueue readyQueue) {
-        Process selectedProcess = null;
-        int minArrivalOrder = Integer.MAX_VALUE; // Inicializamos con el máximo valor posible
-        for (int j = readyQueue.getFront(); j <= readyQueue.getEnd(); j++) {
-            if (readyQueue.getProcesses()[j] != null && readyQueue.getProcesses()[j].getArrivalOrder() < minArrivalOrder) {
-                minArrivalOrder = readyQueue.getProcesses()[j].getArrivalOrder(); // Establece un nuevo mínimo
-                selectedProcess = readyQueue.getProcesses()[j]; // Guarda el proceso seleccionado
-            }
-        }
-        if (selectedProcess != null) {
-            readyQueue.remove(selectedProcess);
-        }
-        return selectedProcess; 
-    }
+//    private Process getProcessFCFS(ProcessQueue readyQueue) {
+//        Process selectedProcess = null;
+//        int minArrivalOrder = Integer.MAX_VALUE; // Inicializamos con el máximo valor posible
+//        for (int j = readyQueue.getFront(); j <= readyQueue.getEnd(); j++) {
+//            if (readyQueue.getProcesses()[j] != null && readyQueue.getProcesses()[j].getArrivalOrder() < minArrivalOrder) {
+//                minArrivalOrder = readyQueue.getProcesses()[j].getArrivalOrder(); // Establece un nuevo mínimo
+//                selectedProcess = readyQueue.getProcesses()[j]; // Guarda el proceso seleccionado
+//            }
+//        }
+//        if (selectedProcess != null) {
+//            readyQueue.remove(selectedProcess);
+//        }
+//        return selectedProcess; 
+//    }
+    
 
 
     //HRRN

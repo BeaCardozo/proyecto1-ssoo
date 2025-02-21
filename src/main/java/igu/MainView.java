@@ -784,16 +784,29 @@ public class MainView extends javax.swing.JFrame {
     }//GEN-LAST:event_ProcessNameTextFieldKeyTyped
 
     private void ModifySpecificationsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ModifySpecificationsButtonActionPerformed
-        //Cambiar los argumentos de System Specifications
-        simulator.classifyProcesses();
-        String selectedItem = SchedulingPolicyComboBox.getSelectedItem().toString();
-            if (selectedItem != null) {
-                SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
-                simulator.setSchedulingPolicy(policy);
-                System.out.println("Selected Policy: " + policy);
-            } else {
-                System.out.println("No se ha seleccionado ninguna política.");
-            }
+    // Cambiar los argumentos de System Specifications
+    System.out.println("Botón Save Oprimido");
+    String selectedUnit = TimeUnitComboBox.getSelectedItem().toString(); // "s" o "ms"
+    int cycleDuration = Integer.parseInt(CycleDurationTextField.getText());
+    if (selectedUnit.equals("s")) {
+        cycleDuration = cycleDuration * 1000;
+    }
+    int newNumProcessors = TwoProcessorsOption.isSelected() ? 2 : 3;
+    simulator.setCycleDuration(cycleDuration);
+    if (simulator.getNumProcessors() != newNumProcessors) {
+        simulator.setNumProcessors(newNumProcessors);
+        simulator.adjustListSize(newNumProcessors);
+    }
+    if (isSimulationActive && timer != null) {
+        timer.stop();
+        timer.setDelay(cycleDuration);
+        timer.start();
+    }
+    String selectedItem = SchedulingPolicyComboBox.getSelectedItem().toString();
+    SchedulingPolicy policy = SchedulingPolicy.fromString(selectedItem);
+    simulator.setSchedulingPolicy(policy);
+    JOptionPane.showMessageDialog(this, "Cycle duration updated to " + cycleDuration + " ms, number of processors updated to " + newNumProcessors + " and planning policy updated to "+policy, "Success", JOptionPane.INFORMATION_MESSAGE);
+    saveToFile();
     }//GEN-LAST:event_ModifySpecificationsButtonActionPerformed
 
     private void LoadTXTButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_LoadTXTButtonActionPerformed

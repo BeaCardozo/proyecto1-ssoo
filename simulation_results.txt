@@ -1,8 +1,8 @@
 #Simulation Data
 #PROCESS
-1160, hola1, 10, false, 3, 2, 1, 0, READY
+9427, UIUOUIHKJ, 15, true, 1, 1, 8, 7, RUNNING
 
 #CONFIG
-Cycle Duration: 1
-Number of Active Processors: 2
-Planning Policy: FCFS
+Cycle Duration: 3
+Number of Active Processors: 3
+Planning Policy: RR
