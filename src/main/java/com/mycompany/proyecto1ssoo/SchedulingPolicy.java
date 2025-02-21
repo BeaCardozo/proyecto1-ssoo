@@ -22,13 +22,13 @@ public enum SchedulingPolicy {
         return description;
     }
 
-    public static SchedulingPolicy fromString(String description) {
+    public static SchedulingPolicy fromString(String input) {
         for (SchedulingPolicy policy : SchedulingPolicy.values()) {
-            if (policy.toString().equalsIgnoreCase(description)) {
+            if (policy.name().equalsIgnoreCase(input) || policy.getDescription().equalsIgnoreCase(input)) {
                 return policy;
             }
         }
         return null; 
-        }
+    }
 
 }

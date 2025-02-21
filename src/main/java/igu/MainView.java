@@ -1084,12 +1084,13 @@ public class MainView extends javax.swing.JFrame {
                                     numberOfActiveProcessors = configParts[1].trim();
                                     selectRadioButton(numberOfActiveProcessors, ActiveProcessorsGroup);
                                     simulator.setNumProcessors(Integer.parseInt(numberOfActiveProcessors));
-                                    simulator.adjustListSize(Integer.parseInt(numberOfActiveProcessors));
+                                    //simulator.adjustListSize(Integer.parseInt(numberOfActiveProcessors)); //CREO QUE ESTE ERA EL ERROR PORSIA AQUI LO DEJO
                                     break;
                                 case "Planning Policy":
                                     planningPolicy = configParts[1].trim();
                                     simulator.setSchedulingPolicy(SchedulingPolicy.fromString(planningPolicy));
-                                    SchedulingPolicyComboBox.setSelectedItem(planningPolicy);
+                                    System.out.println(SchedulingPolicy.fromString(planningPolicy));
+                                    SchedulingPolicyComboBox.setSelectedItem(SchedulingPolicy.fromString(planningPolicy).toString());
                                     break;
                                 default:
                                 showErrorDialog("Invalid File! Error: " + line);
